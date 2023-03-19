@@ -1,26 +1,6 @@
 const canvas = document.getElementById("board");
 const ctx = canvas.getContext("2d");
 
-// chech if window size is changed
-window.addEventListener("resize", function () {
-    // chech if div with warning message exists
-    if (!document.querySelector(".warningSign")) {
-        const div = document.createElement("div");
-        const h1 =
-            "Please refresh the page to have the best playing experience";
-        div.innerHTML =
-            h1 + "<br>" + "(click on the text to ignore this message)";
-        div.className = "warningSign";
-        document.body.appendChild(div);
-    }
-    // delete the message if clicked on it
-    document
-        .querySelector(".warningSign")
-        .addEventListener("click", function () {
-            document.querySelector(".warningSign").remove();
-        });
-});
-
 document.addEventListener("DOMContentLoaded", function () {
     const game = new Game();
     game.newGame();
@@ -128,6 +108,28 @@ class Game {
         this.rocks.push(new Rock());
     }
 
+    addResizeListener() {
+        // chech if window size is changed
+        window.addEventListener("resize", function () {
+            // chech if div with warning message exists
+            if (!document.querySelector(".warningSign")) {
+                const div = document.createElement("div");
+                const h1 =
+                    "Please refresh the page to have the best playing experience";
+                div.innerHTML =
+                    h1 + "<br>" + "(click on the text to ignore this message)";
+                div.className = "warningSign";
+                document.body.appendChild(div);
+            }
+            // delete the message if clicked on it
+            document
+                .querySelector(".warningSign")
+                .addEventListener("click", function () {
+                    document.querySelector(".warningSign").remove();
+                });
+        });
+    }
+
     checkScreenCompability() {
         if (window.innerWidth < 1200) {
             canvas.style.visibility = "hidden";
@@ -138,26 +140,9 @@ class Game {
         }
     }
 
-    render() {
-        // clear canvas
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // draw rocket
-        rocket.draw();
-
-        // draw rocks
-        for (let i = 0; i < rocks.length; i++) {
-            rocks[i].draw();
-            rocks[i].move();
-            rocks[i].checkCollision();
-            if (rocks[i].checkIfOutOfScreen()) {
-                rocks.splice(i, 1);
-            }
-        }
-    }
-
     newGame() {
         this.checkScreenCompability();
+        this.addResizeListener();
         // Set canvas size to 80% window size
         canvas.width = window.innerWidth * 0.75;
         canvas.height = window.innerHeight * 0.8;
@@ -188,8 +173,29 @@ class Game {
         });
 
         // render game
-        setInterval(function () {
-            game.render();
-        }, 1000 / 60);
+        setInterval(
+            function () {
+                this.render();
+            }.bind(this),
+            1000 / 60
+        );
+    }
+
+    render() {
+        // clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // draw rocket
+        this.rocket.draw();
+
+        // draw rocks
+        this.rocks.forEach(function (rock) {
+            rock.draw();
+            rock.move();
+            rock.checkCollision();
+            if (rock.checkIfOutOfScreen()) {
+                this.rocks.splice(this.rocks.indexOf(rock), 1);
+            }
+        }, this);
     }
 }
