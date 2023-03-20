@@ -82,10 +82,10 @@ class Rock {
 
     checkCollision() {
         if (
-            this.x < rocket.x + rocket.width &&
-            this.x + this.width > rocket.x &&
-            this.y < rocket.y + rocket.height &&
-            this.y + this.height > rocket.y
+            this.x < Rocket.x + Rocket.width &&
+            this.x + this.width > Rocket.x &&
+            this.y < Rocket.y + Rocket.height &&
+            this.y + this.height > Rocket.y
         ) {
             console.log("collision");
         }
@@ -100,12 +100,11 @@ class Rock {
 
 class Game {
     constructor() {
-        this.rocks = [];
+        // create rocket
         this.rocket = new Rocket();
-    }
 
-    addRock() {
-        this.rocks.push(new Rock());
+        // create rocks
+        this.rocks = [];
     }
 
     addResizeListener() {
@@ -147,38 +146,31 @@ class Game {
         canvas.width = window.innerWidth * 0.75;
         canvas.height = window.innerHeight * 0.8;
 
-        // create rocket
-        const rocket = new Rocket();
-
-        // create rocks
-        const rocks = [];
-
-        // create rock every 1 second
+        // create rocks every 1 second
         setInterval(function () {
-            rocks.push(new Rock());
+            this.rocks.push(new Rock());
         }, 1000);
 
-        // Add event listener for keydown
+        // add event listeners for movement
+        this.addMovementListeners();
 
+        // start render loop
+        this.render();
+    }
+
+    // add event listeners for movement
+    addMovementListeners() {
         document.addEventListener("keydown", function (event) {
             if (event.keyCode === 37 && event.shiftKey) {
-                rocket.moveLeftMore();
+                this.rocket.moveLeftMore();
             } else if (event.keyCode === 39 && event.shiftKey) {
-                rocket.moveRightMore();
+                this.rocket.moveRightMore();
             } else if (event.keyCode === 37) {
-                rocket.moveLeft();
+                this.rocket.moveLeft();
             } else if (event.keyCode === 39) {
-                rocket.moveRight();
+                this.rocket.moveRight();
             }
         });
-
-        // render game
-        setInterval(
-            function () {
-                this.render();
-            }.bind(this),
-            1000 / 60
-        );
     }
 
     render() {
@@ -197,5 +189,8 @@ class Game {
                 this.rocks.splice(this.rocks.indexOf(rock), 1);
             }
         }, this);
+
+        // call render function again
+        requestAnimationFrame(this.render.bind(this));
     }
 }
