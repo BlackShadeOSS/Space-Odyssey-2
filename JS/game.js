@@ -1,21 +1,29 @@
 const canvas = document.getElementById("board");
 const ctx = canvas.getContext("2d");
 
+var textures = {
+    rocket: new Image(),
+    rock: new Image(),
+};
+textures.rocket.src = "../Photos/rocket.png";
+textures.rock.src = "../Photos/rock.png";
+var game;
 document.addEventListener("DOMContentLoaded", function () {
-    const game = new Game();
+    game = new Game();
     game.newGame();
 });
 
 class Rocket {
     constructor() {
-        this.rocketTexture = new Image();
-        this.rocketTexture.src = "Photos/rocket.png";
+        this.rocketTexture = textures.rocket;
         this.originalWidth = this.rocketTexture.width;
         this.originalHeight = this.rocketTexture.height;
+        console.log(this.rocketTexture.clientHeight);
         this.width = this.originalWidth / 8;
         this.height = this.originalHeight / 8;
         this.x = 0;
         this.y = canvas.height - (this.height + 25);
+        console.log("roccket create");
     }
 
     draw() {
@@ -56,8 +64,7 @@ class Rocket {
 
 class Rock {
     constructor() {
-        this.rockTexture = new Image();
-        this.rockTexture.src = "Photos/rock.png";
+        this.rockTexture = textures.rock;
         this.originalWidth = this.rockTexture.width;
         this.originalHeight = this.rockTexture.height;
         this.width = this.originalWidth / 8;
@@ -147,9 +154,7 @@ class Game {
         canvas.height = window.innerHeight * 0.8;
 
         // create rocks every 1 second
-        setInterval(function () {
-            this.rocks.push(new Rock());
-        }, 1000);
+        setInterval(this.addRock(), 1000);
 
         // add event listeners for movement
         this.addMovementListeners();
@@ -157,18 +162,22 @@ class Game {
         // start render loop
         this.render();
     }
+    addRock() {
+        game.rocks.push(new Rock());
+        console.log(game);
+    }
 
     // add event listeners for movement
     addMovementListeners() {
         document.addEventListener("keydown", function (event) {
             if (event.keyCode === 37 && event.shiftKey) {
-                this.rocket.moveLeftMore();
+                game.rocket.moveLeftMore();
             } else if (event.keyCode === 39 && event.shiftKey) {
-                this.rocket.moveRightMore();
+                game.rocket.moveRightMore();
             } else if (event.keyCode === 37) {
-                this.rocket.moveLeft();
+                game.rocket.moveLeft();
             } else if (event.keyCode === 39) {
-                this.rocket.moveRight();
+                game.rocket.moveRight();
             }
         });
     }
@@ -178,19 +187,20 @@ class Game {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         // draw rocket
-        this.rocket.draw();
+        game.rocket.draw();
 
         // draw rocks
-        this.rocks.forEach(function (rock) {
+        game.rocks.forEach(function (rock) {
+            console.log(rock);
             rock.draw();
             rock.move();
             rock.checkCollision();
             if (rock.checkIfOutOfScreen()) {
-                this.rocks.splice(this.rocks.indexOf(rock), 1);
+                game.rocks.splice(game.rocks.indexOf(rock), 1);
             }
-        }, this);
+        }, game);
 
         // call render function again
-        requestAnimationFrame(this.render.bind(this));
+        requestAnimationFrame(game.render);
     }
 }
