@@ -8,7 +8,7 @@ var textures = {
 textures.rocket.src = "../Photos/rocket.png";
 textures.rock.src = "../Photos/rock.png";
 var game;
-document.addEventListener("DOMContentLoaded", function () {
+textures.rock.addEventListener("load", function () {
     game = new Game();
     game.newGame();
 });
@@ -18,12 +18,10 @@ class Rocket {
         this.rocketTexture = textures.rocket;
         this.originalWidth = this.rocketTexture.width;
         this.originalHeight = this.rocketTexture.height;
-        console.log(this.rocketTexture.clientHeight);
         this.width = this.originalWidth / 8;
         this.height = this.originalHeight / 8;
         this.x = 0;
         this.y = canvas.height - (this.height + 25);
-        console.log("roccket create");
     }
 
     draw() {
@@ -69,7 +67,7 @@ class Rock {
         this.originalHeight = this.rockTexture.height;
         this.width = this.originalWidth / 8;
         this.height = this.originalHeight / 8;
-        this.x = Math.floor(Math.random() * canvas.width);
+        this.x = Math.floor(Math.random() * (canvas.width - this.width));
         this.y = 0;
     }
 
@@ -89,10 +87,10 @@ class Rock {
 
     checkCollision() {
         if (
-            this.x < Rocket.x + Rocket.width &&
-            this.x + this.width > Rocket.x &&
-            this.y < Rocket.y + Rocket.height &&
-            this.y + this.height > Rocket.y
+            this.x < game.rocket.x + game.rocket.width &&
+            this.x + this.width > game.rocket.x &&
+            this.y < game.rocket.y + game.rocket.height &&
+            this.y + this.height > game.rocket.y
         ) {
             console.log("collision");
         }
@@ -106,13 +104,7 @@ class Rock {
 }
 
 class Game {
-    constructor() {
-        // create rocket
-        this.rocket = new Rocket();
-
-        // create rocks
-        this.rocks = [];
-    }
+    constructor() {}
 
     addResizeListener() {
         // chech if window size is changed
@@ -153,18 +145,20 @@ class Game {
         canvas.width = window.innerWidth * 0.75;
         canvas.height = window.innerHeight * 0.8;
 
+        // create rocket
+        this.rocket = new Rocket();
+
+        // create rocks
+        this.rocks = [];
+
         // create rocks every 1 second
-        setInterval(this.addRock(), 1000);
+        setInterval(game.rocks.push(new Rock()), 1000);
 
         // add event listeners for movement
         this.addMovementListeners();
 
         // start render loop
         this.render();
-    }
-    addRock() {
-        game.rocks.push(new Rock());
-        console.log(game);
     }
 
     // add event listeners for movement
@@ -191,7 +185,6 @@ class Game {
 
         // draw rocks
         game.rocks.forEach(function (rock) {
-            console.log(rock);
             rock.draw();
             rock.move();
             rock.checkCollision();
