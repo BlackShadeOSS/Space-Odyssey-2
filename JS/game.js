@@ -8,7 +8,13 @@ var textures = {
 textures.rocket.src = "../Photos/rocket.png";
 textures.rock.src = "../Photos/rock.png";
 var game;
-textures.rock.addEventListener("load", function () {
+document.addEventListener("DOMContentLoaded", () => {
+    // Set canvas size to 80% window size
+    canvas.width = window.innerWidth * 0.75;
+    canvas.height = window.innerHeight * 0.8;
+});
+
+textures.rock.addEventListener("load", () => {
     game = new Game();
     game.newGame();
 });
@@ -20,7 +26,7 @@ class Rocket {
         this.originalHeight = this.rocketTexture.height;
         this.width = this.originalWidth / 8;
         this.height = this.originalHeight / 8;
-        this.x = 0;
+        this.x = canvas.width / 2 - this.width / 2;
         this.y = canvas.height - (this.height + 25);
     }
 
@@ -82,7 +88,7 @@ class Rock {
     }
 
     move() {
-        this.y += 5;
+        this.y += 2;
     }
 
     checkCollision() {
@@ -104,7 +110,10 @@ class Rock {
 }
 
 class Game {
-    constructor() {}
+    constructor() {
+        this.rocket;
+        this.rocks;
+    }
 
     addResizeListener() {
         // chech if window size is changed
@@ -141,9 +150,6 @@ class Game {
     newGame() {
         this.checkScreenCompability();
         this.addResizeListener();
-        // Set canvas size to 80% window size
-        canvas.width = window.innerWidth * 0.75;
-        canvas.height = window.innerHeight * 0.8;
 
         // create rocket
         this.rocket = new Rocket();
@@ -152,7 +158,9 @@ class Game {
         this.rocks = [];
 
         // create rocks every 1 second
-        setInterval(game.rocks.push(new Rock()), 1000);
+        setInterval(() => {
+            this.rocks.push(new Rock());
+        }, 1000);
 
         // add event listeners for movement
         this.addMovementListeners();
@@ -177,6 +185,8 @@ class Game {
     }
 
     render() {
+        // calcutate delta time
+
         // clear canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
