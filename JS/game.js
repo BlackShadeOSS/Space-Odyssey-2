@@ -7,6 +7,7 @@ var textures = {
 };
 textures.rocket.src = "../Photos/rocket.png";
 textures.rock.src = "../Photos/rock.png";
+var texturesLoaded = false;
 var keysActive;
 var game;
 document.addEventListener("DOMContentLoaded", () => {
@@ -16,8 +17,14 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 textures.rock.addEventListener("load", () => {
-    game = new Game();
-    game.newGame();
+    texturesLoaded = true;
+});
+
+canvas.addEventListener("click", () => {
+    if (texturesLoaded && !game) {
+        game = new Game();
+        game.newGame();
+    }
 });
 
 class Rocket {
@@ -31,6 +38,7 @@ class Rocket {
         this.y = canvas.height - (this.height + 25);
         this.addMovementListeners();
         this.xVelocity = 0;
+        this.friction = 0.92;
         keysActive = [];
     }
 
@@ -38,13 +46,11 @@ class Rocket {
         window.addEventListener("keydown", (e) => {
             var key = e.key.toLowerCase();
             if (!keysActive.includes(key)) keysActive.push(key);
-            console.log(keysActive);
         });
         window.addEventListener("keyup", (e) => {
             var key = e.key.toLowerCase();
             if (keysActive.includes(key))
                 keysActive.splice(keysActive.indexOf(key), 1);
-            console.log(keysActive);
         });
     }
 
@@ -56,22 +62,40 @@ class Rocket {
             this.width,
             this.height
         );
-        console.log(this.x + " " + this.y);
     }
 
     moveUpdate() {
-        if (keysActive.includes("d") || keysActive.includes("arrowright")) {
-            this.xVelocity = 1;
+        {
+            if (
+                keysActive.includes("shift") &&
+                (keysActive.includes("d") || keysActive.includes("arrowright"))
+            ) {
+                this.xVelocity = 3.5;
+            } else if (
+                keysActive.includes("shift") &&
+                (keysActive.includes("a") || keysActive.includes("arrowleft"))
+            ) {
+                this.xVelocity = -3.5;
+            } else if (
+                keysActive.includes("d") ||
+                keysActive.includes("arrowright")
+            ) {
+                this.xVelocity = 2;
+            } else if (
+                keysActive.includes("a") ||
+                keysActive.includes("arrowleft")
+            ) {
+                this.xVelocity = -2;
+            } else {
+                this.xVelocity *= this.friction;
+            }
         }
-        if (keysActive.includes("a") || keysActive.includes("arrowleft")) {
-            this.xVelocity = -1;
+        {
+            if (this.x <= 0) this.x = 0;
+            if (this.x >= canvas.width - this.width)
+                this.x = canvas.width - this.width;
+            else this.x += (this.xVelocity * game.deltaTime) / 5;
         }
-        if (keysActive.includes("shift")) {
-            this.xVelocity *= 2;
-        } else {
-            this.xVelocity = 0;
-        }
-        this.x += this.xVelocity * game.deltaTime;
     }
 }
 
@@ -84,6 +108,7 @@ class Rock {
         this.height = this.originalHeight / 8;
         this.x = Math.floor(Math.random() * (canvas.width - this.width));
         this.y = 0;
+        this.yVelocity = 2;
     }
 
     draw() {
@@ -97,7 +122,7 @@ class Rock {
     }
 
     move() {
-        this.y += 2;
+        this.y += (this.yVelocity * game.deltaTime) / 7.5;
     }
 
     checkCollision() {
@@ -150,6 +175,30 @@ class Game {
         });
     }
 
+    detectDefocus() {
+        window.addEventListener("blur", () => {
+            this.stop = true;
+            if (!document.querySelector(".warningSign")) {
+                const div = document.createElement("div");
+                const h1 =
+                    "You have defocused the page, we stopped the game for you";
+                div.innerHTML =
+                    h1 + "<br>" + "(click on the text to resume the game)";
+                div.className = "warningSign";
+                document.body.appendChild(div);
+            }
+            // delete the message if clicked on it
+            document
+                .querySelector(".warningSign")
+                .addEventListener("click", function () {
+                    document.querySelector(".warningSign").remove();
+                    game.stop = false;
+                    game.render();
+                    keysActive = [];
+                });
+        });
+    }
+
     checkScreenCompability() {
         if (window.innerWidth < 1200) {
             canvas.style.visibility = "hidden";
@@ -170,6 +219,9 @@ class Game {
         // create rocks
         this.rocks = [];
 
+        // detect if window is defocused
+        this.detectDefocus();
+
         // create rocks every 1 second
         setInterval(() => {
             this.rocks.push(new Rock());
@@ -181,7 +233,7 @@ class Game {
 
     render() {
         // calcutate delta time
-        game.deltaTime = (Date.now() - game.lastTime) / 1000;
+        game.deltaTime = Date.now() - game.lastTime;
         game.lastTime = Date.now();
         // caltuclate fps
         game.fps = 1 / game.deltaTime;
