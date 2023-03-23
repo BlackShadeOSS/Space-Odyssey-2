@@ -187,7 +187,7 @@ class Game {
                 div.className = "warningSign";
                 document.body.appendChild(div);
             }
-            // delete the message if clicked on it
+            // resume the game if clicked on the message
             document
                 .querySelector(".warningSign")
                 .addEventListener("click", function () {
@@ -210,7 +210,10 @@ class Game {
     }
 
     newGame() {
+        // check if screen is big enough
         this.checkScreenCompability();
+
+        // add resize listener
         this.addResizeListener();
 
         // create rocket
