@@ -7,6 +7,7 @@ var textures = {
 };
 textures.rocket.src = "../Photos/rocket.png";
 textures.rock.src = "../Photos/rock.png";
+var keysActive;
 var game;
 document.addEventListener("DOMContentLoaded", () => {
     // Set canvas size to 80% window size
@@ -28,6 +29,23 @@ class Rocket {
         this.height = this.originalHeight / 8;
         this.x = canvas.width / 2 - this.width / 2;
         this.y = canvas.height - (this.height + 25);
+        this.addMovementListeners();
+        this.xVelocity = 0;
+        keysActive = [];
+    }
+
+    addMovementListeners() {
+        window.addEventListener("keydown", (e) => {
+            var key = e.key.toLowerCase();
+            if (!keysActive.includes(key)) keysActive.push(key);
+            console.log(keysActive);
+        });
+        window.addEventListener("keyup", (e) => {
+            var key = e.key.toLowerCase();
+            if (keysActive.includes(key))
+                keysActive.splice(keysActive.indexOf(key), 1);
+            console.log(keysActive);
+        });
     }
 
     draw() {
@@ -41,28 +59,19 @@ class Rocket {
         console.log(this.x + " " + this.y);
     }
 
-    moveLeft() {
-        if (this.x <= 0) {
-            this.x = 0;
-        } else this.x -= 10;
-    }
-
-    moveRight() {
-        if (this.x >= canvas.width - this.width) {
-            this.x = canvas.width - this.width;
-        } else this.x += 10;
-    }
-
-    moveLeftMore() {
-        if (this.x <= 0) {
-            this.x = 0;
-        } else this.x -= 25;
-    }
-
-    moveRightMore() {
-        if (this.x >= canvas.width - this.width) {
-            this.x = canvas.width - this.width;
-        } else this.x += 25;
+    moveUpdate() {
+        if (keysActive.includes("d") || keysActive.includes("arrowright")) {
+            this.xVelocity = 1;
+        }
+        if (keysActive.includes("a") || keysActive.includes("arrowleft")) {
+            this.xVelocity = -1;
+        }
+        if (keysActive.includes("shift")) {
+            this.xVelocity *= 2;
+        } else {
+            this.xVelocity = 0;
+        }
+        this.x += this.xVelocity * game.deltaTime;
     }
 }
 
@@ -94,11 +103,11 @@ class Rock {
     checkCollision() {
         if (
             this.x < game.rocket.x + game.rocket.width &&
-            this.x + this.width > game.rocket.x &&
+            this.x + this.width / 2 > game.rocket.x &&
             this.y < game.rocket.y + game.rocket.height &&
-            this.y + this.height > game.rocket.y
+            this.y + this.height / 1.75 > game.rocket.y
         ) {
-            console.log("collision");
+            game.stop = true;
         }
     }
 
@@ -113,6 +122,10 @@ class Game {
     constructor() {
         this.rocket;
         this.rocks;
+        this.lastTime = Date.now();
+        this.deltaTime;
+        this.fps;
+        this.stop = false;
     }
 
     addResizeListener() {
@@ -162,30 +175,19 @@ class Game {
             this.rocks.push(new Rock());
         }, 1000);
 
-        // add event listeners for movement
-        this.addMovementListeners();
-
         // start render loop
         this.render();
     }
 
-    // add event listeners for movement
-    addMovementListeners() {
-        document.addEventListener("keydown", function (event) {
-            if (event.keyCode === 37 && event.shiftKey) {
-                game.rocket.moveLeftMore();
-            } else if (event.keyCode === 39 && event.shiftKey) {
-                game.rocket.moveRightMore();
-            } else if (event.keyCode === 37) {
-                game.rocket.moveLeft();
-            } else if (event.keyCode === 39) {
-                game.rocket.moveRight();
-            }
-        });
-    }
-
     render() {
         // calcutate delta time
+        game.deltaTime = (Date.now() - game.lastTime) / 1000;
+        game.lastTime = Date.now();
+        // caltuclate fps
+        game.fps = 1 / game.deltaTime;
+
+        // move rocket
+        game.rocket.moveUpdate();
 
         // clear canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -204,6 +206,6 @@ class Game {
         }, game);
 
         // call render function again
-        requestAnimationFrame(game.render);
+        if (!game.stop) requestAnimationFrame(game.render);
     }
 }
