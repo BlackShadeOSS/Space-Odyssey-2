@@ -4,9 +4,11 @@ const ctx = canvas.getContext("2d");
 var textures = {
     rocket: new Image(),
     rock: new Image(),
+    meteor: new Image(),
 };
 textures.rocket.src = "../Photos/rocket.png";
 textures.rock.src = "../Photos/rock.png";
+textures.meteor.src = "../Photos/meteor.png";
 var texturesLoaded = false;
 var keysActive;
 var game;
@@ -14,6 +16,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // Set canvas size to 80% window size
     canvas.width = window.innerWidth * 0.75;
     canvas.height = window.innerHeight * 0.8;
+    if (window.innerWidth < 1200) {
+        canvas.style.visibility = "hidden";
+        const h1 = document.createElement("h1");
+        h1.innerHTML = "Please open this page on a bigger screen";
+        h1.className = "warningSign";
+        document.body.appendChild(h1);
+    }
 });
 
 textures.rock.addEventListener("load", () => {
@@ -38,7 +47,7 @@ class Rocket {
         this.y = canvas.height - (this.height + 25);
         this.addMovementListeners();
         this.xVelocity = 0;
-        this.friction = 0.92;
+        this.friction = 0.85;
         keysActive = [];
     }
 
@@ -143,10 +152,66 @@ class Rock {
     }
 }
 
+class Meteor {
+    constructor() {
+        this.meteorTexture = textures.meteor;
+        this.originalWidth = this.meteorTexture.width;
+        this.originalHeight = this.meteorTexture.height;
+        this.width = this.originalWidth / 6;
+        this.height = this.originalHeight / 6;
+        this.x = Math.floor(Math.random() * (canvas.width - this.width));
+        this.y = 0;
+        // random angle between 45 and 135 degrees  (in radians)
+        this.angle = Math.random() * (Math.PI / 4) + Math.PI / 4;
+        this.Velocity = 5;
+    }
+
+    draw() {
+        ctx.save();
+        ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+        ctx.rotate(this.angle);
+        ctx.drawImage(
+            this.meteorTexture,
+            this.width / 2,
+            this.height / 2,
+            this.width,
+            this.height
+        );
+        ctx.restore();
+    }
+
+    move() {
+        this.x += (this.Velocity * game.deltaTime * Math.cos(this.angle)) / 7.5;
+        this.y += (this.Velocity * game.deltaTime * Math.sin(this.angle)) / 7.5;
+    }
+
+    checkCollision() {
+        if (
+            this.x < game.rocket.x + game.rocket.width &&
+            this.x + this.width > game.rocket.x &&
+            this.y < game.rocket.y + game.rocket.height &&
+            this.y + this.height > game.rocket.y
+        ) {
+            game.stop = true;
+        }
+    }
+
+    checkIfOutOfScreen() {
+        if (this.y >= canvas.height) {
+            return true;
+        } else if (this.x >= canvas.width) {
+            return true;
+        } else if (this.x <= 0) {
+            return true;
+        } else return false;
+    }
+}
+
 class Game {
     constructor() {
         this.rocket;
         this.rocks;
+        this.meteors;
         this.lastTime = Date.now();
         this.deltaTime;
         this.fps;
@@ -199,20 +264,7 @@ class Game {
         });
     }
 
-    checkScreenCompability() {
-        if (window.innerWidth < 1200) {
-            canvas.style.visibility = "hidden";
-            const h1 = document.createElement("h1");
-            h1.innerHTML = "Please open this page on a bigger screen";
-            h1.className = "warningSign";
-            document.body.appendChild(h1);
-        }
-    }
-
     newGame() {
-        // check if screen is big enough
-        this.checkScreenCompability();
-
         // add resize listener
         this.addResizeListener();
 
@@ -222,6 +274,9 @@ class Game {
         // create rocks
         this.rocks = [];
 
+        // create meteors
+        this.meteors = [];
+
         // detect if window is defocused
         this.detectDefocus();
 
@@ -229,6 +284,11 @@ class Game {
         setInterval(() => {
             this.rocks.push(new Rock());
         }, 1000);
+
+        // create meteors every 15 seconds
+        setInterval(() => {
+            this.meteors.push(new Meteor());
+        }, 10000);
 
         // start render loop
         this.render();
@@ -257,6 +317,16 @@ class Game {
             rock.checkCollision();
             if (rock.checkIfOutOfScreen()) {
                 game.rocks.splice(game.rocks.indexOf(rock), 1);
+            }
+        }, game);
+
+        // draw meteors
+        game.meteors.forEach(function (meteor) {
+            meteor.draw();
+            meteor.move();
+            meteor.checkCollision();
+            if (meteor.checkIfOutOfScreen()) {
+                game.meteors.splice(game.meteors.indexOf(meteor), 1);
             }
         }, game);
 
