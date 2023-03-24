@@ -137,7 +137,7 @@ class Rock {
     checkCollision() {
         if (
             this.x < game.rocket.x + game.rocket.width &&
-            this.x + this.width / 2 > game.rocket.x &&
+            this.x + this.width / 1.9 > game.rocket.x &&
             this.y < game.rocket.y + game.rocket.height &&
             this.y + this.height / 1.75 > game.rocket.y
         ) {
@@ -188,9 +188,9 @@ class Meteor {
     checkCollision() {
         if (
             this.x < game.rocket.x + game.rocket.width &&
-            this.x + this.width > game.rocket.x &&
+            this.x + this.width / 1.5 > game.rocket.x &&
             this.y < game.rocket.y + game.rocket.height &&
-            this.y + this.height > game.rocket.y
+            this.y + this.height / 1.5 > game.rocket.y
         ) {
             game.stop = true;
         }
@@ -283,7 +283,7 @@ class Game {
         // create rocks every 1 second
         setInterval(() => {
             this.rocks.push(new Rock());
-        }, 1000);
+        }, 750);
 
         // create meteors every 15 seconds
         setInterval(() => {
