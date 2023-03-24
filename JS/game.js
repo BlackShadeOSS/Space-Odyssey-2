@@ -2,10 +2,12 @@ const canvas = document.getElementById("board");
 const ctx = canvas.getContext("2d");
 
 var textures = {
+    pressEnter: new Image(),
     rocket: new Image(),
     rock: new Image(),
     meteor: new Image(),
 };
+textures.pressEnter.src = "../Photos/pressEnter.png";
 textures.rocket.src = "../Photos/rocket.png";
 textures.rock.src = "../Photos/rock.png";
 textures.meteor.src = "../Photos/meteor.png";
@@ -27,12 +29,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
 textures.rock.addEventListener("load", () => {
     texturesLoaded = true;
+    // render press enter for 1 second then clear for 1 second and repeat
+    this.originalWidth = textures.pressEnter.width / 1.25;
+    this.originalHeight = textures.pressEnter.height / 1.25;
+    setInterval(() => {
+        if (game) return;
+        ctx.drawImage(
+            textures.pressEnter,
+            canvas.width / 2 - this.originalWidth / 2,
+            canvas.height / 2 - this.originalHeight / 2,
+            this.originalWidth,
+            this.originalHeight
+        );
+        setTimeout(() => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }, 750);
+    }, 1500);
 });
 
-canvas.addEventListener("click", () => {
-    if (texturesLoaded && !game) {
-        game = new Game();
-        game.newGame();
+window.addEventListener("keydown", (e) => {
+    if (e.key == "Enter" && !game) {
+        if (texturesLoaded && !game) {
+            game = new Game();
+            game.newGame();
+        }
     }
 });
 
@@ -162,7 +182,7 @@ class Meteor {
         this.x = Math.floor(Math.random() * (canvas.width - this.width));
         this.y = 0;
         // random angle between 45 and 135 degrees  (in radians)
-        this.angle = Math.random() * (Math.PI / 4) + Math.PI / 4;
+        this.angle = 90; //Math.random() * (Math.PI / 4) + Math.PI / 4;
         this.Velocity = 5;
     }
 
@@ -240,6 +260,19 @@ class Game {
         });
     }
 
+    resetListener() {
+        // reset game if letter "r" is pressed
+        window.addEventListener("keydown", (e) => {
+            if (e.key === "r") {
+                game.stop = false;
+                game.rocks = [];
+                game.meteors = [];
+                game.rocket = new Rocket();
+                game.render();
+            }
+        });
+    }
+
     detectDefocus() {
         window.addEventListener("blur", () => {
             this.stop = true;
@@ -267,6 +300,9 @@ class Game {
     newGame() {
         // add resize listener
         this.addResizeListener();
+
+        // add reset listener
+        this.resetListener();
 
         // create rocket
         this.rocket = new Rocket();
