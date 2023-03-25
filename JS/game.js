@@ -30,6 +30,7 @@ var tutorialTexturesLoaded = false;
 var keysActive;
 var game;
 var tutorial;
+var stopwatch;
 document.addEventListener("DOMContentLoaded", () => {
     // Set canvas size to 80% window size
     canvas.width = window.innerWidth * 0.75;
@@ -41,6 +42,8 @@ document.addEventListener("DOMContentLoaded", () => {
         h1.className = "warningSign";
         document.body.appendChild(h1);
     }
+
+    stopwatch = document.getElementById("stopwatch");
 });
 
 tutorialTextures.ready.addEventListener("load", () => {
@@ -69,7 +72,7 @@ textures.rock.addEventListener("load", () => {
 
 window.addEventListener("keydown", (e) => {
     if (e.key == "Enter" && !game) {
-        if (tutorialTexturesLoaded && !game) {
+        if (tutorialTexturesLoaded && !tutorial) {
             tutorial = new Tutorial();
             tutorial.moveGif();
         }
@@ -197,19 +200,14 @@ class Meteor {
         this.meteorTexture = textures.meteor;
         this.originalWidth = this.meteorTexture.width;
         this.originalHeight = this.meteorTexture.height;
-        this.width = this.originalWidth / 6;
-        this.height = this.originalHeight / 6;
+        this.width = this.originalWidth / 4;
+        this.height = this.originalHeight / 4;
         this.x = Math.floor(Math.random() * (canvas.width - this.width));
         this.y = 0;
-        // random angle between 45 and 135 degrees  (in radians)
-        this.angle = 90; //Math.random() * (Math.PI / 4) + Math.PI / 4;
         this.Velocity = 5;
     }
 
     draw() {
-        ctx.save();
-        ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
-        ctx.rotate(this.angle);
         ctx.drawImage(
             this.meteorTexture,
             this.width / 2,
@@ -217,12 +215,10 @@ class Meteor {
             this.width,
             this.height
         );
-        ctx.restore();
     }
 
     move() {
-        this.x += (this.Velocity * game.deltaTime * Math.cos(this.angle)) / 7.5;
-        this.y += (this.Velocity * game.deltaTime * Math.sin(this.angle)) / 7.5;
+        this.y += (this.Velocity * game.deltaTime) / 7.5;
     }
 
     checkCollision() {
@@ -239,10 +235,6 @@ class Meteor {
     checkIfOutOfScreen() {
         if (this.y >= canvas.height) {
             return true;
-        } else if (this.x >= canvas.width) {
-            return true;
-        } else if (this.x <= 0) {
-            return true;
         } else return false;
     }
 }
@@ -252,6 +244,7 @@ class Game {
         this.rocket;
         this.rocks;
         this.meteors;
+        this.time = 0;
         this.lastTime = Date.now();
         this.deltaTime;
         this.fps;
@@ -283,10 +276,11 @@ class Game {
     resetListener() {
         // reset game if letter "r" is pressed
         window.addEventListener("keydown", (e) => {
-            if (e.key === "r") {
+            if (e.key == "r") {
                 game.stop = false;
                 game.rocks = [];
                 game.meteors = [];
+                game.time = 0;
                 game.rocket = new Rocket();
                 game.render();
             }
@@ -317,6 +311,19 @@ class Game {
         });
     }
 
+    showTime() {
+        // show time on stopwatch
+        stopwatch.innerHTML =
+            `T+` +
+            Math.floor(this.time / 60000)
+                .toString()
+                .padStart(2, "0") +
+            `:` +
+            (Math.floor(this.time / 1000) - Math.floor(this.time / 60000) * 60)
+                .toString()
+                .padStart(2, "0");
+    }
+
     newGame() {
         // add resize listener
         this.addResizeListener();
@@ -342,9 +349,9 @@ class Game {
         }, 750);
 
         // create meteors every 15 seconds
-        setInterval(() => {
-            this.meteors.push(new Meteor());
-        }, 10000);
+        // setInterval(() => {
+        //     this.meteors.push(new Meteor());
+        // }, 10000);
 
         // start render loop
         this.render();
@@ -354,6 +361,11 @@ class Game {
         // calcutate delta time
         game.deltaTime = Date.now() - game.lastTime;
         game.lastTime = Date.now();
+
+        //add detla time to time
+        game.time += game.deltaTime;
+        // show time
+        game.showTime();
         // caltuclate fps
         game.fps = 1 / game.deltaTime;
 
@@ -399,7 +411,6 @@ class Tutorial {
             canvas.height / 2 - tutorialTextures.neutral.height / 2
         );
         setTimeout(() => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(
                 tutorialTextures.left,
                 canvas.width / 2 - tutorialTextures.left.width / 2,
@@ -407,7 +418,6 @@ class Tutorial {
             );
         }, 750);
         setTimeout(() => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(
                 tutorialTextures.neutral,
                 canvas.width / 2 - tutorialTextures.neutral.width / 2,
@@ -415,7 +425,6 @@ class Tutorial {
             );
         }, 1500);
         setTimeout(() => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(
                 tutorialTextures.right,
                 canvas.width / 2 - tutorialTextures.right.width / 2,
@@ -423,7 +432,6 @@ class Tutorial {
             );
         }, 2250);
         setTimeout(() => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(
                 tutorialTextures.neutral,
                 canvas.width / 2 - tutorialTextures.neutral.width / 2,
@@ -431,7 +439,6 @@ class Tutorial {
             );
         }, 3000);
         setTimeout(() => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(
                 tutorialTextures.shiftLeft,
                 canvas.width / 2 - tutorialTextures.shiftLeft.width / 2,
@@ -439,7 +446,6 @@ class Tutorial {
             );
         }, 3750);
         setTimeout(() => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(
                 tutorialTextures.neutral,
                 canvas.width / 2 - tutorialTextures.neutral.width / 2,
@@ -447,7 +453,6 @@ class Tutorial {
             );
         }, 4500);
         setTimeout(() => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(
                 tutorialTextures.shiftRight,
                 canvas.width / 2 - tutorialTextures.shiftRight.width / 2,
@@ -455,7 +460,6 @@ class Tutorial {
             );
         }, 5250);
         setTimeout(() => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(
                 tutorialTextures.neutral,
                 canvas.width / 2 - tutorialTextures.neutral.width / 2,
@@ -463,7 +467,6 @@ class Tutorial {
             );
         }, 6000);
         setTimeout(() => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(
                 tutorialTextures.ready,
                 canvas.width / 2 - tutorialTextures.ready.width / 2,
