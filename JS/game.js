@@ -370,3 +370,5 @@ class Game {
         if (!game.stop) requestAnimationFrame(game.render);
     }
 }
+
+class Tutorial {}
