@@ -12,8 +12,23 @@ textures.rocket.src = "../Photos/rocket.png";
 textures.rock.src = "../Photos/rock.png";
 textures.meteor.src = "../Photos/meteor.png";
 var texturesLoaded = false;
+var tutorialTextures = {
+    neutral: new Image(),
+    left: new Image(),
+    right: new Image(),
+    shiftLeft: new Image(),
+    shiftRight: new Image(),
+    ready: new Image(),
+};
+tutorialTextures.neutral.src = "../Photos/tutorial-L-R/frame-N.png";
+tutorialTextures.left.src = "../Photos/tutorial-L-R/frame-L.png";
+tutorialTextures.right.src = "../Photos/tutorial-L-R/frame-R.png";
+tutorialTextures.shiftLeft.src = "../Photos/tutorial-L-R/frame-NL.png";
+tutorialTextures.shiftRight.src = "../Photos/tutorial-L-R/frame-NR.png";
+tutorialTextures.ready.src = "../Photos/tutorial-L-R/frame-READY.png";
 var keysActive;
 var game;
+var tutorial;
 document.addEventListener("DOMContentLoaded", () => {
     // Set canvas size to 80% window size
     canvas.width = window.innerWidth * 0.75;
@@ -33,7 +48,7 @@ textures.rock.addEventListener("load", () => {
     this.originalWidth = textures.pressEnter.width / 1.25;
     this.originalHeight = textures.pressEnter.height / 1.25;
     setInterval(() => {
-        if (game) return;
+        if (tutorial) return;
         ctx.drawImage(
             textures.pressEnter,
             canvas.width / 2 - this.originalWidth / 2,
@@ -50,8 +65,8 @@ textures.rock.addEventListener("load", () => {
 window.addEventListener("keydown", (e) => {
     if (e.key == "Enter" && !game) {
         if (texturesLoaded && !game) {
-            game = new Game();
-            game.newGame();
+            tutorial = new Tutorial();
+            tutorial.moveGif();
         }
     }
 });
@@ -371,4 +386,89 @@ class Game {
     }
 }
 
-class Tutorial {}
+class Tutorial {
+    moveGif() {
+        ctx.drawImage(
+            tutorialTextures.neutral,
+            canvas.width / 2 - tutorialTextures.neutral.width / 2,
+            canvas.height / 2 - tutorialTextures.neutral.height / 2
+        );
+        setTimeout(() => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(
+                tutorialTextures.left,
+                canvas.width / 2 - tutorialTextures.left.width / 2,
+                canvas.height / 2 - tutorialTextures.left.height / 2
+            );
+        }, 750);
+        setTimeout(() => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(
+                tutorialTextures.neutral,
+                canvas.width / 2 - tutorialTextures.neutral.width / 2,
+                canvas.height / 2 - tutorialTextures.neutral.height / 2
+            );
+        }, 1500);
+        setTimeout(() => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(
+                tutorialTextures.right,
+                canvas.width / 2 - tutorialTextures.right.width / 2,
+                canvas.height / 2 - tutorialTextures.right.height / 2
+            );
+        }, 2250);
+        setTimeout(() => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(
+                tutorialTextures.neutral,
+                canvas.width / 2 - tutorialTextures.neutral.width / 2,
+                canvas.height / 2 - tutorialTextures.neutral.height / 2
+            );
+        }, 3000);
+        setTimeout(() => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(
+                tutorialTextures.shiftLeft,
+                canvas.width / 2 - tutorialTextures.shiftLeft.width / 2,
+                canvas.height / 2 - tutorialTextures.shiftLeft.height / 2
+            );
+        }, 3750);
+        setTimeout(() => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(
+                tutorialTextures.neutral,
+                canvas.width / 2 - tutorialTextures.neutral.width / 2,
+                canvas.height / 2 - tutorialTextures.neutral.height / 2
+            );
+        }, 4500);
+        setTimeout(() => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(
+                tutorialTextures.shiftRight,
+                canvas.width / 2 - tutorialTextures.shiftRight.width / 2,
+                canvas.height / 2 - tutorialTextures.shiftRight.height / 2
+            );
+        }, 5250);
+        setTimeout(() => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(
+                tutorialTextures.neutral,
+                canvas.width / 2 - tutorialTextures.neutral.width / 2,
+                canvas.height / 2 - tutorialTextures.neutral.height / 2
+            );
+        }, 6000);
+        setTimeout(() => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(
+                tutorialTextures.ready,
+                canvas.width / 2 - tutorialTextures.ready.width / 2,
+                canvas.height / 2 - tutorialTextures.ready.height / 2
+            );
+        }, 6750);
+        setTimeout(() => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            game = new Game();
+            game.newGame();
+        }, 8000);
+    }
+}
