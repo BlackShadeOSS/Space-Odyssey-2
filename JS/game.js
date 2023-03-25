@@ -26,6 +26,7 @@ tutorialTextures.right.src = "../Photos/tutorial-L-R/frame-R.png";
 tutorialTextures.shiftLeft.src = "../Photos/tutorial-L-R/frame-NL.png";
 tutorialTextures.shiftRight.src = "../Photos/tutorial-L-R/frame-NR.png";
 tutorialTextures.ready.src = "../Photos/tutorial-L-R/frame-READY.png";
+var tutorialTexturesLoaded = false;
 var keysActive;
 var game;
 var tutorial;
@@ -40,6 +41,10 @@ document.addEventListener("DOMContentLoaded", () => {
         h1.className = "warningSign";
         document.body.appendChild(h1);
     }
+});
+
+tutorialTextures.ready.addEventListener("load", () => {
+    tutorialTexturesLoaded = true;
 });
 
 textures.rock.addEventListener("load", () => {
@@ -64,7 +69,7 @@ textures.rock.addEventListener("load", () => {
 
 window.addEventListener("keydown", (e) => {
     if (e.key == "Enter" && !game) {
-        if (texturesLoaded && !game) {
+        if (tutorialTexturesLoaded && !game) {
             tutorial = new Tutorial();
             tutorial.moveGif();
         }
@@ -135,8 +140,8 @@ class Rocket {
             }
         }
         {
-            if (this.x <= 0) this.x = 0;
-            if (this.x >= canvas.width - this.width)
+            if (this.x < 0) this.x = 0;
+            if (this.x > canvas.width - this.width)
                 this.x = canvas.width - this.width;
             else this.x += (this.xVelocity * game.deltaTime) / 5;
         }
