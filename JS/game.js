@@ -304,30 +304,6 @@ class Game {
         });
     }
 
-    detectDefocus() {
-        window.addEventListener("blur", () => {
-            this.stop = true;
-            if (!document.querySelector(".warningSign")) {
-                const div = document.createElement("div");
-                const h1 =
-                    "You have defocused the page, I've stopped the game for you";
-                div.innerHTML =
-                    h1 + "<br>" + "(click on the text to resume the game)";
-                div.className = "warningSign";
-                document.body.appendChild(div);
-            }
-            // resume the game if clicked on the message
-            document
-                .querySelector(".warningSign")
-                .addEventListener("click", function () {
-                    document.querySelector(".warningSign").remove();
-                    game.stop = false;
-                    game.render();
-                    keysActive = [];
-                });
-        });
-    }
-
     showTime() {
         // show time on stopwatch
         stopwatch.innerHTML =
@@ -370,9 +346,6 @@ class Game {
 
         // create weapon pack item
         this.weaponPackItems = [];
-
-        // detect if window is defocused
-        this.detectDefocus();
 
         // create rocks every 0.75 second
         setInterval(() => {
@@ -455,7 +428,7 @@ class Game {
 
         // Spawn weapon pack item after 2.5 minutes on level 1 if there is no weapon pack item on the screen and if the rocket doesn't have a weapon pack item yet
         if (
-            game.time > 150000 &&
+            game.timeOnThisLevel > 150000 &&
             game.weaponPackItems.length == 0 &&
             game.rocket.hasWeaponPack == false &&
             game.levels.levelNumber == 1
@@ -466,6 +439,10 @@ class Game {
         game.levelProgress = Math.floor(
             (game.timeOnThisLevel / game.levels.levelTime) * 100
         );
+        // spawn boss
+        if (game.timeOnThisLevel > game.levels.levelTime) {
+            //not implemented yet
+        }
 
         // Check if level is completed
         if (
