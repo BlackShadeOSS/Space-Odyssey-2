@@ -86,7 +86,7 @@ window.addEventListener("keydown", (e) => {
             tutorial.moveGif();
         }
     }
-    if (e.key == "Enter" && tutorial && tutorial.readyToSkip) {
+    if (e.key == "Enter" && tutorial && tutorial.readyToSkip && !game) {
         tutorial.skipTutorial = true;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         game = new Game();
@@ -191,7 +191,7 @@ class Rocket {
 }
 
 class Rock {
-    constructor() {
+    constructor(n = 2) {
         this.rockTexture = textures.rock;
         this.originalWidth = this.rockTexture.width;
         this.originalHeight = this.rockTexture.height;
@@ -199,7 +199,7 @@ class Rock {
         this.height = this.originalHeight / 8;
         this.x = Math.floor(Math.random() * (canvas.width - this.width));
         this.y = 0;
-        this.yVelocity = 2;
+        this.yVelocity = n;
         if (game.rocks.length > 0)
             while (
                 Math.abs(
@@ -259,6 +259,7 @@ class Game {
         this.missles;
         this.weaponPackItem;
         this.time = 0;
+        this.rockInterval;
         this.timeOnThisLevel = 0;
         this.lastTime = Date.now();
         this.deltaTime;
@@ -266,6 +267,7 @@ class Game {
         this.fps;
         this.levels;
         this.stop = false;
+        this.godmode = false;
     }
 
     addResizeListener() {
@@ -294,6 +296,7 @@ class Game {
         // reset game if letter "r" is pressed
         window.addEventListener("keydown", (e) => {
             if (e.key.toLowerCase() == "r") {
+                clearInterval(game.rockInterval);
                 game.stop = false;
                 game.rocks = [];
                 game.meteors = [];
@@ -347,31 +350,11 @@ class Game {
         // create rocket
         this.rocket = new Rocket();
 
-        // create rocks
-        this.rocks = [];
-
-        // create meteors
-        this.meteors = [];
-
-        // create missles
-        this.missles = [];
-
         //create level
         this.levels = new Levels();
 
         // create weapon pack item
         this.weaponPackItems = [];
-
-        // create rocks every 0.75 second
-        setInterval(() => {
-            for (let i = canvas.width; i > 0; i -= 500)
-                if (!this.stop) this.rocks.push(new Rock());
-        }, 750);
-
-        // create meteors every 10 seconds
-        setInterval(() => {
-            if (!this.stop) this.meteors.push(new Meteor());
-        }, 10000);
 
         // start render loop
         this.render();
@@ -415,7 +398,7 @@ class Game {
         game.rocks.forEach(function (rock) {
             rock.draw();
             rock.move();
-            rock.checkCollision();
+            if (game.godmode == false) rock.checkCollision();
             if (rock.checkIfOutOfScreen()) {
                 game.rocks.splice(game.rocks.indexOf(rock), 1);
             }
@@ -464,10 +447,10 @@ class Game {
 
         // Check if level is completed
         if (
-            game.timeOnThisLevel > game.levels.levelTime &&
-            game.levels.bossKilled == true
+            game.timeOnThisLevel > game.levels.levelTime
+            // && game.levels.bossKilled == true
         ) {
-            game.levels.level(game.levels.levelNumber + 1);
+            game.levels.setLevel(game.levels.levelNumber + 1);
         }
         // call render function again
         if (!game.stop) requestAnimationFrame(game.render);
@@ -656,24 +639,66 @@ class Levels {
         this.levelTime;
         this.levelNumber;
         this.bossNumber;
+        this.rockIntervalTime;
+        this.rockSpeed;
         this.bossKilled = false;
         this.setLevel(1);
     }
-    setLevel(number) {
+    setLevel(number = 1) {
         if (number == 1) {
             this.level1();
         } else if (number == 2) {
             this.level2();
+        } else if (number == 3) {
+            this.level3();
         }
     }
     level1() {
         this.levelTime = 300000;
+        this.rockIntervalTime = 750;
+        this.rockSpeed = 2;
         this.levelNumber = 1;
         this.bossNumber = 1;
+        game.rocks = [];
+        game.meteors = [];
+        game.missles = [];
+        clearInterval(game.rockInterval);
+        game.rockInterval = setInterval(() => {
+            for (let i = canvas.width; i > 0; i -= 500)
+                if (!game.stop) game.rocks.push(new Rock(this.rockSpeed));
+        }, this.rockIntervalTime);
+        game.timeOnThisLevel = 0;
     }
     level2() {
         this.levelTime = 450000;
+        this.rockIntervalTime = 500;
+        this.rockSpeed = 3;
         this.levelNumber = 2;
         this.bossNumber = 2;
+        game.rocks = [];
+        game.meteors = [];
+        game.missles = [];
+        clearInterval(game.rockInterval);
+        game.rockInterval = setInterval(() => {
+            for (let i = canvas.width; i > 0; i -= 500)
+                if (!game.stop) game.rocks.push(new Rock(this.rockSpeed));
+        }, this.rockIntervalTime);
+        game.timeOnThisLevel = 0;
+    }
+    level3() {
+        this.levelTime = 600000;
+        this.rockIntervalTime = 500;
+        this.rockSpeed = 4;
+        this.levelNumber = 3;
+        this.bossNumber = 3;
+        game.rocks = [];
+        game.meteors = [];
+        game.missles = [];
+        clearInterval(game.rockInterval);
+        game.rockInterval = setInterval(() => {
+            for (let i = canvas.width; i > 0; i -= 500)
+                if (!game.stop) game.rocks.push(new Rock(this.rockSpeed));
+        }, this.rockIntervalTime);
+        game.timeOnThisLevel = 0;
     }
 }
