@@ -23,7 +23,7 @@ var tutorialTextures = {
     shiftRight: new Image(),
     ready: new Image(),
 };
-tutorialTextures.before.src = "/.Photos/tutorial-L-R/frame-BEFORE.png";
+tutorialTextures.before.src = "./Photos/tutorial-L-R/frame-BEFORE.png";
 tutorialTextures.neutral.src = "./Photos/tutorial-L-R/frame-N.png";
 tutorialTextures.left.src = "./Photos/tutorial-L-R/frame-L.png";
 tutorialTextures.right.src = "./Photos/tutorial-L-R/frame-R.png";
