@@ -8,11 +8,11 @@ var textures = {
     missle: new Image(),
     weaponPackItem: new Image(),
 };
-textures.pressEnter.src = "../Photos/pressEnter.png";
-textures.rocket.src = "../Photos/rocket.png";
-textures.rock.src = "../Photos/rock.png";
-textures.missle.src = "../Photos/missle.png";
-textures.weaponPackItem.src = "../Photos/weapon-pack.png";
+textures.pressEnter.src = "/Photos/pressEnter.png";
+textures.rocket.src = "/Photos/rocket.png";
+textures.rock.src = "/Photos/rock.png";
+textures.missle.src = "/Photos/missle.png";
+textures.weaponPackItem.src = "/Photos/weapon-pack.png";
 var texturesLoaded = false;
 var tutorialTextures = {
     before: new Image(),
@@ -23,13 +23,13 @@ var tutorialTextures = {
     shiftRight: new Image(),
     ready: new Image(),
 };
-tutorialTextures.before.src = "../Photos/tutorial-L-R/frame-BEFORE.png";
-tutorialTextures.neutral.src = "../Photos/tutorial-L-R/frame-N.png";
-tutorialTextures.left.src = "../Photos/tutorial-L-R/frame-L.png";
-tutorialTextures.right.src = "../Photos/tutorial-L-R/frame-R.png";
-tutorialTextures.shiftLeft.src = "../Photos/tutorial-L-R/frame-NL.png";
-tutorialTextures.shiftRight.src = "../Photos/tutorial-L-R/frame-NR.png";
-tutorialTextures.ready.src = "../Photos/tutorial-L-R/frame-READY.png";
+tutorialTextures.before.src = "/Photos/tutorial-L-R/frame-BEFORE.png";
+tutorialTextures.neutral.src = "/Photos/tutorial-L-R/frame-N.png";
+tutorialTextures.left.src = "/Photos/tutorial-L-R/frame-L.png";
+tutorialTextures.right.src = "/Photos/tutorial-L-R/frame-R.png";
+tutorialTextures.shiftLeft.src = "/Photos/tutorial-L-R/frame-NL.png";
+tutorialTextures.shiftRight.src = "/Photos/tutorial-L-R/frame-NR.png";
+tutorialTextures.ready.src = "/Photos/tutorial-L-R/frame-READY.png";
 var tutorialTexturesLoaded = false;
 var keysActive;
 var game;
