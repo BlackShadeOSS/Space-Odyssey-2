@@ -5,14 +5,12 @@ var textures = {
     pressEnter: new Image(),
     rocket: new Image(),
     rock: new Image(),
-    meteor: new Image(),
     missle: new Image(),
     weaponPackItem: new Image(),
 };
 textures.pressEnter.src = "../Photos/pressEnter.png";
 textures.rocket.src = "../Photos/rocket.png";
 textures.rock.src = "../Photos/rock.png";
-textures.meteor.src = "../Photos/meteor.png";
 textures.missle.src = "../Photos/missle.png";
 textures.weaponPackItem.src = "../Photos/weapon-pack.png";
 var texturesLoaded = false;
@@ -230,11 +228,17 @@ class Rock {
     }
 
     checkCollision() {
+        // check if rocket is hit by rock
+        // hitbox is 3/4 in width and 1/2 in height of the rock and is in the middle of the rock
         if (
-            this.x < game.rocket.x + game.rocket.width &&
-            this.x + this.width / 1.5 > game.rocket.x &&
-            this.y < game.rocket.y + game.rocket.height &&
-            this.y + this.height / 2 > game.rocket.y
+            game.rocket.x + game.rocket.width / 4 <
+                this.x + this.width / 4 + this.width / 2 &&
+            game.rocket.x + game.rocket.width / 4 + this.width / 2 >
+                this.x + this.width / 4 &&
+            game.rocket.y + game.rocket.height / 2 <
+                this.y + this.height / 2 + this.height / 2 &&
+            game.rocket.y + game.rocket.height / 2 + this.height / 2 >
+                this.y + this.height / 2
         ) {
             game.stop = true;
         }
