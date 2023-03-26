@@ -38,9 +38,10 @@ var game;
 var tutorial;
 var stopwatch;
 var levelWatch;
+var levelProgressBar;
 document.addEventListener("DOMContentLoaded", () => {
     // Set canvas size to 80% window size
-    canvas.width = window.innerWidth * 0.75;
+    canvas.width = window.innerWidth * 0.725;
     canvas.height = window.innerHeight * 0.8;
     if (window.innerWidth < 1200) {
         canvas.style.visibility = "hidden";
@@ -52,6 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     stopwatch = document.getElementById("stopwatch");
     levelWatch = document.getElementById("level");
+    levelProgressBar = document.getElementsByClassName("rocketInPB")[0];
 });
 
 tutorialTextures.ready.addEventListener("load", () => {
@@ -317,6 +319,15 @@ class Game {
                 .padStart(2, "0");
     }
 
+    updateProgressBar() {
+        // update progress bar
+        if (66 - (this.levelProgress / 100) * 66 < 0) {
+            levelProgressBar.style.top = 0 + "vh";
+        } else
+            levelProgressBar.style.top =
+                66 - (this.levelProgress / 100) * 66 + "vh";
+    }
+
     showLevel() {
         // show level
         levelWatch.innerHTML = `Level: ${this.levels.levelNumber}`;
@@ -377,6 +388,9 @@ class Game {
 
         // show level
         game.showLevel();
+
+        // update progress bar
+        game.updateProgressBar();
 
         // caltuclate fps
         game.fps = 1 / game.deltaTime;
