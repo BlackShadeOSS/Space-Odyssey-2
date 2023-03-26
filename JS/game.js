@@ -6,11 +6,15 @@ var textures = {
     rocket: new Image(),
     rock: new Image(),
     meteor: new Image(),
+    missle: new Image(),
+    weaponPackItem: new Image(),
 };
 textures.pressEnter.src = "../Photos/pressEnter.png";
 textures.rocket.src = "../Photos/rocket.png";
 textures.rock.src = "../Photos/rock.png";
 textures.meteor.src = "../Photos/meteor.png";
+textures.missle.src = "../Photos/missle.png";
+textures.weaponPackItem.src = "../Photos/weapon-pack.png";
 var texturesLoaded = false;
 var tutorialTextures = {
     before: new Image(),
@@ -100,6 +104,8 @@ class Rocket {
         this.addMovementListeners();
         this.xVelocity = 0;
         this.friction = 0.85;
+        this.hasWeaponPack = false;
+        this.lastTimeFire = 0;
         keysActive = [];
     }
 
@@ -123,6 +129,23 @@ class Rocket {
             this.width,
             this.height
         );
+    }
+
+    fire() {
+        if (this.hasWeaponPack) {
+            if (Date.now() - this.lastTimeFire > 400) {
+                this.lastTimeFire = Date.now();
+                game.missles.push(new Missle());
+            }
+        }
+    }
+
+    checkIfFireWeapon() {
+        if (keysActive.includes("w") || keysActive.includes("arrowup")) {
+            if (this.hasWeaponPack) {
+                this.fire();
+            }
+        }
     }
 
     moveUpdate() {
@@ -157,6 +180,11 @@ class Rocket {
                 this.x = canvas.width - this.width;
             else this.x += (this.xVelocity * game.deltaTime) / 5;
         }
+    }
+
+    weaponPackUpgrade() {
+        textures.rocket.src = "../Photos/rocket-with-weapon.png";
+        this.hasWeaponPack = true;
     }
 }
 
@@ -224,7 +252,7 @@ class Meteor {
         this.height = this.originalHeight / 4;
         this.x = Math.floor(Math.random() * (canvas.width - this.width));
         this.y = 0;
-        this.yVelocity = 8.5;
+        this.yVelocity = 7.5;
     }
     draw() {
         ctx.drawImage(
@@ -243,9 +271,9 @@ class Meteor {
     checkCollision() {
         if (
             this.x < game.rocket.x + game.rocket.width &&
-            this.x + this.width / 1.5 > game.rocket.x &&
+            this.x + this.width / 3 > game.rocket.x &&
             this.y < game.rocket.y + game.rocket.height &&
-            this.y + this.height / 1.5 > game.rocket.y
+            this.y + this.height / 3 > game.rocket.y
         ) {
             game.stop = true;
         }
@@ -263,10 +291,15 @@ class Game {
         this.rocket;
         this.rocks;
         this.meteors;
+        this.missles;
+        this.weaponPackItem;
         this.time = 0;
+        this.timeOnThisLevel = 0;
         this.lastTime = Date.now();
         this.deltaTime;
+        this.levelProgress = 0;
         this.fps;
+        this.levels;
         this.stop = false;
     }
 
@@ -301,6 +334,9 @@ class Game {
                 game.meteors = [];
                 game.time = 0;
                 game.rocket = new Rocket();
+                game.weaponPackItem = [];
+                game.missles = [];
+                textures.rocket.src = "../Photos/rocket.png";
                 game.render();
             }
         });
@@ -359,6 +395,15 @@ class Game {
         // create meteors
         this.meteors = [];
 
+        // create missles
+        this.missles = [];
+
+        //create level
+        this.levels = new Levels();
+
+        // create weapon pack item
+        this.weaponPackItems = [];
+
         // detect if window is defocused
         this.detectDefocus();
 
@@ -384,6 +429,9 @@ class Game {
 
         //add detla time to time
         game.time += game.deltaTime;
+
+        // add time on this level
+        game.timeOnThisLevel += game.deltaTime;
         // show time
         game.showTime();
         // caltuclate fps
@@ -391,6 +439,9 @@ class Game {
 
         // move rocket
         game.rocket.moveUpdate();
+
+        // check if rocket fired missle
+        game.rocket.checkIfFireWeapon();
 
         // clear canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -418,6 +469,50 @@ class Game {
             }
         }, game);
 
+        // draw missles
+        game.missles.forEach(function (missle) {
+            missle.draw();
+            missle.move();
+            missle.checkCollision();
+            if (missle.checkIfOutOfScreen()) {
+                game.missles.splice(game.missles.indexOf(missle), 1);
+            }
+        }, game);
+
+        // draw weapon pack item
+        game.weaponPackItems.forEach(function (item) {
+            item.draw();
+            item.move();
+            item.checkCollision();
+            if (item.checkIfOutOfScreen()) {
+                game.weaponPackItems.splice(
+                    game.weaponPackItems.indexOf(item),
+                    1
+                );
+            }
+        }, game);
+
+        // Spawn weapon pack item after 2.5 minutes on level 1 if there is no weapon pack item on the screen and if the rocket doesn't have a weapon pack item yet
+        if (
+            game.time > 150000 &&
+            game.weaponPackItems.length == 0 &&
+            game.rocket.hasWeaponPack == false &&
+            game.levels.levelNumber == 1
+        ) {
+            game.weaponPackItems.push(new WeaponPackItem());
+        }
+        // Update level progress
+        game.levelProgress = Math.floor(
+            (game.timeOnThisLevel / game.levels.levelTime) * 100
+        );
+
+        // Check if level is completed
+        if (
+            game.timeOnThisLevel > game.levels.levelTime &&
+            game.levels.bossKilled == true
+        ) {
+            game.levels.level(game.levels.levelNumber + 1);
+        }
         // call render function again
         if (!game.stop) requestAnimationFrame(game.render);
     }
@@ -523,5 +618,106 @@ class Tutorial {
             game = new Game();
             game.newGame();
         }, 11000);
+    }
+}
+
+class WeaponPackItem {
+    constructor() {
+        this.weaponPackItemTexture = textures.weaponPackItem;
+        this.originalWidth = this.weaponPackItemTexture.width;
+        this.originalHeight = this.weaponPackItemTexture.height;
+        this.width = this.originalWidth / 2;
+        this.height = this.originalHeight / 2;
+        this.x = Math.floor(Math.random() * (canvas.width - this.width));
+        this.y = 0;
+        this.yVelocity = 2;
+    }
+    draw() {
+        ctx.drawImage(
+            this.weaponPackItemTexture,
+            this.x,
+            this.y,
+            this.width,
+            this.height
+        );
+    }
+    move() {
+        this.y += (this.yVelocity * game.deltaTime) / 7.5;
+    }
+    checkCollision() {
+        if (
+            game.rocket.x < this.x + this.width &&
+            game.rocket.x + game.rocket.width > this.x &&
+            game.rocket.y < this.y + this.height &&
+            game.rocket.y + game.rocket.height > this.y
+        ) {
+            game.rocket.weaponPackUpgrade();
+            game.weaponPackItems.splice(game.weaponPackItems.indexOf(this), 1);
+        }
+    }
+    checkIfOutOfScreen() {
+        if (this.y > canvas.height) {
+            return true;
+        }
+    }
+}
+
+class Missle {
+    constructor() {
+        this.missleTexture = textures.missle;
+        this.originalWidth = this.missleTexture.width;
+        this.originalHeight = this.missleTexture.height;
+        this.width = this.originalWidth / 8;
+        this.height = this.originalHeight / 8;
+        this.x = game.rocket.x + game.rocket.width / 2 - this.width / 2;
+        this.y = game.rocket.y - this.height;
+        this.yVelocity = 2;
+    }
+    draw() {
+        ctx.drawImage(
+            this.missleTexture,
+            this.x,
+            this.y,
+            this.width,
+            this.height
+        );
+    }
+    move() {
+        this.y -= (this.yVelocity * game.deltaTime) / 7.5;
+    }
+    checkCollision() {
+        // not implemented yet
+    }
+    checkIfOutOfScreen() {
+        if (this.y < 0 - this.height) {
+            return true;
+        }
+    }
+}
+
+class Levels {
+    constructor() {
+        this.levelTime;
+        this.levelNumber;
+        this.bossNumber;
+        this.bossKilled = false;
+        this.setLevel(1);
+    }
+    setLevel(number) {
+        if (number == 1) {
+            this.level1();
+        } else if (number == 2) {
+            this.level2();
+        }
+    }
+    level1() {
+        this.levelTime = 300000;
+        this.levelNumber = 1;
+        this.bossNumber = 1;
+    }
+    level2() {
+        this.levelTime = 450000;
+        this.levelNumber = 2;
+        this.bossNumber = 2;
     }
 }
