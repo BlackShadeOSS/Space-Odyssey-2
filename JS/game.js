@@ -67,6 +67,7 @@ textures.rock.addEventListener("load", () => {
             this.originalHeight
         );
         setTimeout(() => {
+            if (tutorial) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }, 750);
     }, 1500);
@@ -169,8 +170,19 @@ class Rock {
         this.x = Math.floor(Math.random() * (canvas.width - this.width));
         this.y = 0;
         this.yVelocity = 2;
+        if (game.rocks.length > 0)
+            while (
+                Math.abs(
+                    game.rocks[game.rocks.length - 1].x +
+                        game.rocks[game.rocks.length - 1].width -
+                        (this.x + this.width)
+                ) < 400
+            ) {
+                this.x = Math.floor(
+                    Math.random() * (canvas.width - this.width)
+                );
+            }
     }
-
     draw() {
         ctx.drawImage(
             this.rockTexture,
@@ -188,9 +200,9 @@ class Rock {
     checkCollision() {
         if (
             this.x < game.rocket.x + game.rocket.width &&
-            this.x + this.width / 1.9 > game.rocket.x &&
+            this.x + this.width / 1.5 > game.rocket.x &&
             this.y < game.rocket.y + game.rocket.height &&
-            this.y + this.height / 1.75 > game.rocket.y
+            this.y + this.height / 2 > game.rocket.y
         ) {
             game.stop = true;
         }
@@ -284,7 +296,7 @@ class Game {
     resetListener() {
         // reset game if letter "r" is pressed
         window.addEventListener("keydown", (e) => {
-            if (e.key == "r") {
+            if (e.key.toLowerCase() == "r") {
                 game.stop = false;
                 game.rocks = [];
                 game.meteors = [];
@@ -301,7 +313,7 @@ class Game {
             if (!document.querySelector(".warningSign")) {
                 const div = document.createElement("div");
                 const h1 =
-                    "You have defocused the page, we stopped the game for you";
+                    "You have defocused the page, I've stopped the game for you";
                 div.innerHTML =
                     h1 + "<br>" + "(click on the text to resume the game)";
                 div.className = "warningSign";
@@ -351,9 +363,10 @@ class Game {
         // detect if window is defocused
         this.detectDefocus();
 
-        // create rocks every 1 second
+        // create rocks every 0.75 second
         setInterval(() => {
-            this.rocks.push(new Rock());
+            for (let i = canvas.width; i > 0; i -= 500)
+                if (!this.stop) this.rocks.push(new Rock());
         }, 750);
 
         // create meteors every 15 seconds
