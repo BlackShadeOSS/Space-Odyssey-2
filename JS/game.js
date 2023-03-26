@@ -224,21 +224,20 @@ class Meteor {
         this.height = this.originalHeight / 4;
         this.x = Math.floor(Math.random() * (canvas.width - this.width));
         this.y = 0;
-        this.Velocity = 5;
+        this.yVelocity = 8.5;
     }
-
     draw() {
         ctx.drawImage(
             this.meteorTexture,
-            this.width / 2,
-            this.height / 2,
+            this.x,
+            this.y,
             this.width,
             this.height
         );
     }
 
     move() {
-        this.y += (this.Velocity * game.deltaTime) / 7.5;
+        this.y += (this.yVelocity * game.deltaTime) / 7.5;
     }
 
     checkCollision() {
@@ -369,10 +368,10 @@ class Game {
                 if (!this.stop) this.rocks.push(new Rock());
         }, 750);
 
-        // create meteors every 15 seconds
-        // setInterval(() => {
-        //     this.meteors.push(new Meteor());
-        // }, 10000);
+        // create meteors every 10 seconds
+        setInterval(() => {
+            if (!this.stop) this.meteors.push(new Meteor());
+        }, 10000);
 
         // start render loop
         this.render();
