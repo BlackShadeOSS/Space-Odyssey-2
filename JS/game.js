@@ -37,6 +37,7 @@ var keysActive;
 var game;
 var tutorial;
 var stopwatch;
+var levelWatch;
 document.addEventListener("DOMContentLoaded", () => {
     // Set canvas size to 80% window size
     canvas.width = window.innerWidth * 0.75;
@@ -50,6 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     stopwatch = document.getElementById("stopwatch");
+    levelWatch = document.getElementById("level");
 });
 
 tutorialTextures.ready.addEventListener("load", () => {
@@ -293,6 +295,9 @@ class Game {
                 game.rocket = new Rocket();
                 game.weaponPackItem = [];
                 game.missles = [];
+                game.levelProgress = 0;
+                game.timeOnThisLevel = 0;
+                game.levels = new Levels();
                 textures.rocket.src = "../Photos/rocket.png";
                 game.render();
             }
@@ -326,7 +331,7 @@ class Game {
     showTime() {
         // show time on stopwatch
         stopwatch.innerHTML =
-            `T+` +
+            `Time Elapsed: ` +
             Math.floor(this.time / 60000)
                 .toString()
                 .padStart(2, "0") +
@@ -334,6 +339,11 @@ class Game {
             (Math.floor(this.time / 1000) - Math.floor(this.time / 60000) * 60)
                 .toString()
                 .padStart(2, "0");
+    }
+
+    showLevel() {
+        // show level
+        levelWatch.innerHTML = `Level: ${this.levels.levelNumber}`;
     }
 
     newGame() {
@@ -391,6 +401,10 @@ class Game {
         game.timeOnThisLevel += game.deltaTime;
         // show time
         game.showTime();
+
+        // show level
+        game.showLevel();
+
         // caltuclate fps
         game.fps = 1 / game.deltaTime;
 
