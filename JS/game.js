@@ -243,49 +243,6 @@ class Rock {
     }
 }
 
-class Meteor {
-    constructor() {
-        this.meteorTexture = textures.meteor;
-        this.originalWidth = this.meteorTexture.width;
-        this.originalHeight = this.meteorTexture.height;
-        this.width = this.originalWidth / 4;
-        this.height = this.originalHeight / 4;
-        this.x = Math.floor(Math.random() * (canvas.width - this.width));
-        this.y = 0;
-        this.yVelocity = 7.5;
-    }
-    draw() {
-        ctx.drawImage(
-            this.meteorTexture,
-            this.x,
-            this.y,
-            this.width,
-            this.height
-        );
-    }
-
-    move() {
-        this.y += (this.yVelocity * game.deltaTime) / 7.5;
-    }
-
-    checkCollision() {
-        if (
-            this.x < game.rocket.x + game.rocket.width &&
-            this.x + this.width / 3 > game.rocket.x &&
-            this.y < game.rocket.y + game.rocket.height &&
-            this.y + this.height / 3 > game.rocket.y
-        ) {
-            game.stop = true;
-        }
-    }
-
-    checkIfOutOfScreen() {
-        if (this.y >= canvas.height) {
-            return true;
-        } else return false;
-    }
-}
-
 class Game {
     constructor() {
         this.rocket;
@@ -456,16 +413,6 @@ class Game {
             rock.checkCollision();
             if (rock.checkIfOutOfScreen()) {
                 game.rocks.splice(game.rocks.indexOf(rock), 1);
-            }
-        }, game);
-
-        // draw meteors
-        game.meteors.forEach(function (meteor) {
-            meteor.draw();
-            meteor.move();
-            meteor.checkCollision();
-            if (meteor.checkIfOutOfScreen()) {
-                game.meteors.splice(game.meteors.indexOf(meteor), 1);
             }
         }, game);
 
