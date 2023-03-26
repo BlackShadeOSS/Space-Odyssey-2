@@ -185,7 +185,7 @@ class Rocket {
     }
 
     weaponPackUpgrade() {
-        textures.rocket.src = "./Photos/rocket-with-weapon.png";
+        textures.rocket.src = "Photos/rocket-with-weapon.png";
         this.hasWeaponPack = true;
     }
 }
