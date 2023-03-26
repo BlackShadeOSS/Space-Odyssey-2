@@ -185,7 +185,7 @@ class Rocket {
     }
 
     weaponPackUpgrade() {
-        textures.rocket.src = "../Photos/rocket-with-weapon.png";
+        textures.rocket.src = "./Photos/rocket-with-weapon.png";
         this.hasWeaponPack = true;
     }
 }
@@ -307,7 +307,7 @@ class Game {
                 game.levelProgress = 0;
                 game.timeOnThisLevel = 0;
                 game.levels = new Levels();
-                textures.rocket.src = "../Photos/rocket.png";
+                textures.rocket.src = "./Photos/rocket.png";
                 game.render();
             }
         });
