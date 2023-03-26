@@ -35,7 +35,7 @@ nav {
 }
 
 #board {
-    margin: 40px auto;
+    margin: 40px 0;
     border: 2px solid white;
     background-color: black;
     overflow: hidden;
@@ -99,4 +99,42 @@ nav {
     position: sticky;
     top: 0;
     font-size: 3.5vh;
+}
+
+.withcanvas {
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    flex-direction: row;
+    width: 100%;
+    position: sticky;
+    top: 0;
+}
+
+.divprogressbar {
+    height: 100%;
+}
+
+.rocketInPB {
+    margin: 0px 20px;
+    height: 10vh;
+    top: 66vh;
+    z-index: 1000000;
+    position: relative;
+}
+
+.progressBar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    height: 77.5vh;
+    top: 0;
+    font-size: 3.5vh;
+}
+
+.progressBarImg {
+    margin: 0;
+    padding: 0;
+    height: 75vh;
 }
