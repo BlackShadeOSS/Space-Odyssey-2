@@ -651,6 +651,10 @@ class Levels {
             this.level2();
         } else if (number == 3) {
             this.level3();
+        } else if (number == 4) {
+            this.level4();
+        } else if (number == 5) {
+            this.level5();
         }
     }
     level1() {
@@ -687,7 +691,7 @@ class Levels {
     }
     level3() {
         this.levelTime = 600000;
-        this.rockIntervalTime = 500;
+        this.rockIntervalTime = 400;
         this.rockSpeed = 4;
         this.levelNumber = 3;
         this.bossNumber = 3;
@@ -697,6 +701,38 @@ class Levels {
         clearInterval(game.rockInterval);
         game.rockInterval = setInterval(() => {
             for (let i = canvas.width; i > 0; i -= 500)
+                if (!game.stop) game.rocks.push(new Rock(this.rockSpeed));
+        }, this.rockIntervalTime);
+        game.timeOnThisLevel = 0;
+    }
+    level4() {
+        this.levelTime = 600000;
+        this.rockIntervalTime = 350;
+        this.rockSpeed = 5;
+        this.levelNumber = 4;
+        this.bossNumber = 4;
+        game.rocks = [];
+        game.meteors = [];
+        game.missles = [];
+        clearInterval(game.rockInterval);
+        game.rockInterval = setInterval(() => {
+            for (let i = canvas.width; i > 0; i -= 400)
+                if (!game.stop) game.rocks.push(new Rock(this.rockSpeed));
+        }, this.rockIntervalTime);
+        game.timeOnThisLevel = 0;
+    }
+    level5() {
+        this.levelTime = 600000;
+        this.rockIntervalTime = 350;
+        this.rockSpeed = 6;
+        this.levelNumber = 5;
+        this.bossNumber = 5;
+        game.rocks = [];
+        game.meteors = [];
+        game.missles = [];
+        clearInterval(game.rockInterval);
+        game.rockInterval = setInterval(() => {
+            for (let i = canvas.width; i > 0; i -= 400)
                 if (!game.stop) game.rocks.push(new Rock(this.rockSpeed));
         }, this.rockIntervalTime);
         game.timeOnThisLevel = 0;
