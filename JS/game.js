@@ -110,6 +110,7 @@ class Rocket {
         this.friction = 0.85;
         this.hasWeaponPack = false;
         this.lastTimeFire = 0;
+        this.amunition = 15;
         keysActive = [];
     }
 
@@ -138,10 +139,21 @@ class Rocket {
     fire() {
         if (this.hasWeaponPack) {
             if (Date.now() - this.lastTimeFire > 400) {
+                if (this.amunition == 0) {
+                    this.reload();
+                    return;
+                }
                 this.lastTimeFire = Date.now();
+                this.amunition--;
                 game.missles.push(new Missle());
             }
         }
+    }
+
+    reload() {
+        setTimeout(() => {
+            this.amunition = 15;
+        }, 2500);
     }
 
     checkIfFireWeapon() {
@@ -429,9 +441,9 @@ class Game {
             }
         }, game);
 
-        // Spawn weapon pack item after 2.5 minutes on level 1 if there is no weapon pack item on the screen and if the rocket doesn't have a weapon pack item yet
+        // Spawn weapon pack item after 1.5 minutes on level 1 if there is no weapon pack item on the screen and if the rocket doesn't have a weapon pack item yet
         if (
-            game.timeOnThisLevel > 150000 &&
+            game.timeOnThisLevel > 90000 &&
             game.weaponPackItems.length == 0 &&
             game.rocket.hasWeaponPack == false &&
             game.levels.levelNumber == 1
@@ -627,6 +639,19 @@ class Missle {
         this.y -= (this.yVelocity * game.deltaTime) / 7.5;
     }
     checkCollision() {
+        //check collision with rocks
+        for (let i = 0; i < game.rocks.length; i++) {
+            if (
+                game.rocks[i].x < this.x + this.width &&
+                game.rocks[i].x + game.rocks[i].width > this.x &&
+                game.rocks[i].y < this.y + this.height &&
+                game.rocks[i].y + game.rocks[i].height > this.y
+            ) {
+                game.rocks.splice(i, 1);
+                game.missles.splice(game.missles.indexOf(this), 1);
+            }
+        }
+        //check collision with boss
         // not implemented yet
     }
     checkIfOutOfScreen() {
@@ -660,7 +685,7 @@ class Levels {
         }
     }
     level1() {
-        this.levelTime = 300000;
+        this.levelTime = 180000;
         this.rockIntervalTime = 750;
         this.rockSpeed = 2;
         this.levelNumber = 1;
@@ -676,7 +701,7 @@ class Levels {
         game.timeOnThisLevel = 0;
     }
     level2() {
-        this.levelTime = 450000;
+        this.levelTime = 300000;
         this.rockIntervalTime = 500;
         this.rockSpeed = 3;
         this.levelNumber = 2;
@@ -692,7 +717,7 @@ class Levels {
         game.timeOnThisLevel = 0;
     }
     level3() {
-        this.levelTime = 600000;
+        this.levelTime = 300000;
         this.rockIntervalTime = 400;
         this.rockSpeed = 4;
         this.levelNumber = 3;
@@ -708,7 +733,7 @@ class Levels {
         game.timeOnThisLevel = 0;
     }
     level4() {
-        this.levelTime = 600000;
+        this.levelTime = 300000;
         this.rockIntervalTime = 350;
         this.rockSpeed = 5;
         this.levelNumber = 4;
@@ -724,7 +749,7 @@ class Levels {
         game.timeOnThisLevel = 0;
     }
     level5() {
-        this.levelTime = 600000;
+        this.levelTime = 450000;
         this.rockIntervalTime = 300;
         this.rockSpeed = 6;
         this.levelNumber = 5;
