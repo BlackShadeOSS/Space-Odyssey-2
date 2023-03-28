@@ -110,7 +110,8 @@ class Rocket {
         this.friction = 0.85;
         this.hasWeaponPack = false;
         this.lastTimeFire = 0;
-        this.amunition = 15;
+        this.amunition = 4;
+        this.reloading = false;
         keysActive = [];
     }
 
@@ -139,7 +140,7 @@ class Rocket {
     fire() {
         if (this.hasWeaponPack) {
             if (Date.now() - this.lastTimeFire > 400) {
-                if (this.amunition == 0) {
+                if (this.amunition == 0 || this.amunition < 0) {
                     this.reload();
                     return;
                 }
@@ -151,9 +152,12 @@ class Rocket {
     }
 
     reload() {
+        if (this.reloading) return;
         setTimeout(() => {
-            this.amunition = 15;
-        }, 2500);
+            this.amunition = 4;
+            this.reloading = false;
+        }, 2000);
+        this.reloading = true;
     }
 
     checkIfFireWeapon() {
