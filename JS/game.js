@@ -11,7 +11,7 @@ var textures = {
 };
 textures.pressEnter.src = "./Photos/pressEnter.png";
 textures.rocket.src = "./Photos/rocket.png";
-textures.rocketWithWeaponPack.src = "./Photos/rocketWithWeaponPack.png";
+textures.rocketWithWeaponPack.src = "./Photos/rocket-with-weapon.png";
 textures.rock.src = "./Photos/rock.png";
 textures.missle.src = "./Photos/missle.png";
 textures.weaponPackItem.src = "./Photos/weapon-pack.png";
