@@ -723,7 +723,7 @@ class Levels {
     }
     level5() {
         this.levelTime = 600000;
-        this.rockIntervalTime = 350;
+        this.rockIntervalTime = 300;
         this.rockSpeed = 6;
         this.levelNumber = 5;
         this.bossNumber = 5;
