@@ -4,12 +4,14 @@ const ctx = canvas.getContext("2d");
 var textures = {
     pressEnter: new Image(),
     rocket: new Image(),
+    rocketWithWeaponPack: new Image(),
     rock: new Image(),
     missle: new Image(),
     weaponPackItem: new Image(),
 };
 textures.pressEnter.src = "./Photos/pressEnter.png";
 textures.rocket.src = "./Photos/rocket.png";
+textures.rocketWithWeaponPack.src = "./Photos/rocketWithWeaponPack.png";
 textures.rock.src = "./Photos/rock.png";
 textures.missle.src = "./Photos/missle.png";
 textures.weaponPackItem.src = "./Photos/weapon-pack.png";
@@ -185,7 +187,7 @@ class Rocket {
     }
 
     weaponPackUpgrade() {
-        textures.rocket.src = "Photos/rocket-with-weapon.png";
+        this.rocketTexture = textures.rocketWithWeaponPack;
         this.hasWeaponPack = true;
     }
 }
@@ -307,7 +309,7 @@ class Game {
                 game.levelProgress = 0;
                 game.timeOnThisLevel = 0;
                 game.levels = new Levels();
-                textures.rocket.src = "./Photos/rocket.png";
+                game.rocket.rocketTexture = textures.rocket;
                 game.render();
             }
         });
