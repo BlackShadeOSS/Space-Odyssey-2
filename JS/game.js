@@ -576,7 +576,7 @@ class Missle {
         this.height = this.originalHeight / 8;
         this.x = game.rocket.x + game.rocket.width / 2 - this.width / 2;
         this.y = game.rocket.y - this.height;
-        this.yVelocity = 7.5;
+        this.yVelocity = 12.5;
     }
     draw() {
         ctx.drawImage(
@@ -620,6 +620,7 @@ class Levels {
         this.bossNumber;
         this.rockIntervalTime;
         this.rockSpeed;
+        this.bossHealth;
         this.bossKilled = false;
         this.setLevel(1);
     }
@@ -642,6 +643,7 @@ class Levels {
         this.rockSpeed = 2;
         this.levelNumber = 1;
         this.bossNumber = 1;
+        this.bossHealth = 1000;
         game.rocks = [];
         game.meteors = [];
         game.missles = [];
@@ -658,6 +660,7 @@ class Levels {
         this.rockSpeed = 3;
         this.levelNumber = 2;
         this.bossNumber = 2;
+        this.bossHealth = 2500;
         game.rocks = [];
         game.meteors = [];
         game.missles = [];
@@ -674,6 +677,7 @@ class Levels {
         this.rockSpeed = 4;
         this.levelNumber = 3;
         this.bossNumber = 3;
+        this.bossHealth = 5000;
         game.rocks = [];
         game.meteors = [];
         game.missles = [];
@@ -690,6 +694,7 @@ class Levels {
         this.rockSpeed = 5;
         this.levelNumber = 4;
         this.bossNumber = 4;
+        this.bossHealth = 12500;
         game.rocks = [];
         game.meteors = [];
         game.missles = [];
@@ -706,6 +711,7 @@ class Levels {
         this.rockSpeed = 6;
         this.levelNumber = 5;
         this.bossNumber = 5;
+        this.bossHealth = 25000;
         game.rocks = [];
         game.meteors = [];
         game.missles = [];
@@ -730,7 +736,7 @@ class Boss {
         this.x = canvas.width / 2 - this.width / 2;
         this.y = 50 + this.height;
         this.xVelocity = 2;
-        this.health = (Math.pow(game.levels.bossNumber, 3) / 3) * 1000;
+        this.health = game.levels.bossHealth;
         this.maxHealth = this.health;
         clearInterval(game.rockInterval);
     }
@@ -776,7 +782,7 @@ class Boss {
                 game.missles[i].y + game.missles[i].height > this.y
             ) {
                 game.missles.splice(i, 1);
-                this.health -= 100;
+                this.health -= 250;
             }
         }
     }
