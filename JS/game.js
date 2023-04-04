@@ -272,6 +272,7 @@ class Rock {
 class Game {
     constructor() {
         this.rocket;
+        this.boss;
         this.rocks;
         this.meteors;
         this.missles;
@@ -318,6 +319,7 @@ class Game {
                 game.stop = false;
                 game.rocks = [];
                 game.meteors = [];
+                game.boss = null;
                 game.time = 0;
                 game.rocket = new Rocket();
                 game.weaponPackItem = [];
@@ -445,6 +447,14 @@ class Game {
             }
         }, game);
 
+        // draw boss
+        if (game.boss != null) {
+            game.boss.move();
+            game.boss.draw();
+            game.boss.checkCollision();
+            game.boss.checkIfDead();
+        }
+
         // Spawn weapon pack item after 1.5 minutes on level 1 if there is no weapon pack item on the screen and if the rocket doesn't have a weapon pack item yet
         if (
             game.timeOnThisLevel > 90000 &&
@@ -460,15 +470,9 @@ class Game {
         );
         // spawn boss
         if (game.timeOnThisLevel > game.levels.levelTime) {
-            //not implemented yet
-        }
-
-        // Check if level is completed
-        if (
-            game.timeOnThisLevel > game.levels.levelTime
-            // && game.levels.bossKilled == true
-        ) {
-            game.levels.setLevel(game.levels.levelNumber + 1);
+            if (game.boss == null) {
+                game.boss = new Boss();
+            }
         }
         // call render function again
         if (!game.stop) requestAnimationFrame(game.render);
@@ -628,7 +632,7 @@ class Missle {
         this.height = this.originalHeight / 8;
         this.x = game.rocket.x + game.rocket.width / 2 - this.width / 2;
         this.y = game.rocket.y - this.height;
-        this.yVelocity = 2;
+        this.yVelocity = 7.5;
     }
     draw() {
         ctx.drawImage(
@@ -767,5 +771,76 @@ class Levels {
                 if (!game.stop) game.rocks.push(new Rock(this.rockSpeed));
         }, this.rockIntervalTime);
         game.timeOnThisLevel = 0;
+    }
+}
+
+class Boss {
+    constructor() {
+        // this.bossTexture = textures.boss;
+        // this.originalWidth = this.bossTexture.width;
+        // this.originalHeight = this.bossTexture.height;
+        // this.width = this.originalWidth / 4;
+        // this.height = this.originalHeight / 4;
+        this.width = 100;
+        this.height = 100;
+        this.x = canvas.width / 2 - this.width / 2;
+        this.y = 50 + this.height;
+        this.xVelocity = 2;
+        this.health = (Math.pow(game.levels.bossNumber, 3) / 3) * 1000;
+        this.maxHealth = this.health;
+        clearInterval(game.rockInterval);
+    }
+    draw() {
+        // ctx.drawImage(
+        //     this.bossTexture,
+        //     this.x,
+        //     this.y,
+        //     this.width,
+        //     this.height
+        // );
+
+        ctx.fillStyle = "blue";
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+
+        // add health bar
+        ctx.fillStyle = "red";
+        ctx.fillRect(this.x, this.y - 20, this.width, 10);
+        ctx.fillStyle = "green";
+        ctx.fillRect(
+            this.x,
+            this.y - 20,
+            (this.width * game.boss.health) / game.boss.maxHealth,
+            10
+        );
+    }
+    move() {
+        // check if is touching the wall
+        if (this.x + this.width > canvas.width) {
+            this.xVelocity = -2;
+        } else if (this.x < 0) {
+            this.xVelocity = 2;
+        }
+        this.x += (this.xVelocity * game.deltaTime) / 7.5;
+    }
+    checkCollision() {
+        //check collision with missles
+        for (let i = 0; i < game.missles.length; i++) {
+            if (
+                game.missles[i].x < this.x + this.width &&
+                game.missles[i].x + game.missles[i].width > this.x &&
+                game.missles[i].y < this.y + this.height &&
+                game.missles[i].y + game.missles[i].height > this.y
+            ) {
+                game.missles.splice(i, 1);
+                this.health -= 100;
+            }
+        }
+    }
+    checkIfDead() {
+        if (this.health <= 0) {
+            game.levels.bossKilled = true;
+            game.levels.setLevel(game.levels.levelNumber + 1);
+            game.boss = null;
+        }
     }
 }
