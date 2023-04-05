@@ -8,13 +8,17 @@ var textures = {
     rock: new Image(),
     missle: new Image(),
     weaponPackItem: new Image(),
+    bullet: new Image(),
 };
-textures.pressEnter.src = "./Photos/pressEnter.png";
-textures.rocket.src = "./Photos/rocket.png";
-textures.rocketWithWeaponPack.src = "./Photos/rocket-with-weapon.png";
-textures.rock.src = "./Photos/rock.png";
-textures.missle.src = "./Photos/missle.png";
-textures.weaponPackItem.src = "./Photos/weapon-pack.png";
+{
+    textures.pressEnter.src = "./Photos/pressEnter.png";
+    textures.rocket.src = "./Photos/rocket.png";
+    textures.rocketWithWeaponPack.src = "./Photos/rocket-with-weapon.png";
+    textures.rock.src = "./Photos/rock.png";
+    textures.missle.src = "./Photos/missle.png";
+    textures.weaponPackItem.src = "./Photos/weapon-pack.png";
+    textures.bullet.src = "./Photos/bullet.png";
+}
 var texturesLoaded = false;
 var tutorialTextures = {
     before: new Image(),
@@ -25,20 +29,24 @@ var tutorialTextures = {
     shiftRight: new Image(),
     ready: new Image(),
 };
-tutorialTextures.before.src = "./Photos/tutorial-L-R/frame-BEFORE.png";
-tutorialTextures.neutral.src = "./Photos/tutorial-L-R/frame-N.png";
-tutorialTextures.left.src = "./Photos/tutorial-L-R/frame-L.png";
-tutorialTextures.right.src = "./Photos/tutorial-L-R/frame-R.png";
-tutorialTextures.shiftLeft.src = "./Photos/tutorial-L-R/frame-NL.png";
-tutorialTextures.shiftRight.src = "./Photos/tutorial-L-R/frame-NR.png";
-tutorialTextures.ready.src = "./Photos/tutorial-L-R/frame-READY.png";
-var tutorialTexturesLoaded = false;
-var keysActive;
-var game;
-var tutorial;
-var stopwatch;
-var levelWatch;
-var levelProgressBar;
+{
+    tutorialTextures.before.src = "./Photos/tutorial-L-R/frame-BEFORE.png";
+    tutorialTextures.neutral.src = "./Photos/tutorial-L-R/frame-N.png";
+    tutorialTextures.left.src = "./Photos/tutorial-L-R/frame-L.png";
+    tutorialTextures.right.src = "./Photos/tutorial-L-R/frame-R.png";
+    tutorialTextures.shiftLeft.src = "./Photos/tutorial-L-R/frame-NL.png";
+    tutorialTextures.shiftRight.src = "./Photos/tutorial-L-R/frame-NR.png";
+    tutorialTextures.ready.src = "./Photos/tutorial-L-R/frame-READY.png";
+}
+{
+    var tutorialTexturesLoaded = false;
+    var keysActive;
+    var game;
+    var tutorial;
+    var stopwatch;
+    var levelWatch;
+    var levelProgressBar;
+}
 document.addEventListener("DOMContentLoaded", () => {
     // Set canvas size to 80% window size
     canvas.width = window.innerWidth * 0.725;
@@ -112,9 +120,12 @@ class Rocket {
         this.xVelocity = 0;
         this.friction = 0.85;
         this.hasWeaponPack = false;
-        this.lastTimeFire = 0;
-        this.amunition = 4;
-        this.reloading = false;
+        this.lastTimeFireMissle = 0;
+        this.amunitionMissle = 4;
+        this.reloadingMissle = false;
+        this.lastTimeFireBullet = 0;
+        this.amunitionBullet = 50;
+        this.reloadingBullet = false;
         keysActive = [];
     }
 
@@ -140,35 +151,69 @@ class Rocket {
         );
     }
 
-    fire() {
+    fireMissle() {
         if (this.hasWeaponPack) {
-            if (Date.now() - this.lastTimeFire > 400) {
-                if (this.amunition == 0 || this.amunition < 0) {
-                    this.reload();
+            if (Date.now() - this.lastTimeFireMissle > 500) {
+                if (this.amunitionMissle <= 0) {
+                    this.reloadMissle();
                     return;
                 }
-                this.lastTimeFire = Date.now();
-                this.amunition--;
+                this.lastTimeFireMissle = Date.now();
+                this.amunitionMissle--;
                 game.missles.push(new Missle());
             }
         }
     }
 
-    reload() {
-        if (this.reloading) return;
+    reloadMissle() {
+        if (this.reloadingMissle) return;
         setTimeout(() => {
-            this.amunition = 4;
-            this.reloading = false;
-        }, 2000);
-        this.reloading = true;
+            this.amunitionMissle = 4;
+            this.reloadingMissle = false;
+        }, 2500);
+        this.reloadingMissle = true;
     }
 
     checkIfFireWeapon() {
-        if (keysActive.includes("w") || keysActive.includes("arrowup")) {
+        if (
+            keysActive.includes("w") ||
+            (keysActive.includes("arrowup") &&
+                !this.reloadingMissle &&
+                keysActive.includes("shift"))
+        ) {
             if (this.hasWeaponPack) {
-                this.fire();
+                this.fireMissle();
             }
         }
+        if (
+            keysActive.includes("w") ||
+            (keysActive.includes("arrowup") && !this.reloadingBullet)
+        ) {
+            if (this.hasWeaponPack) {
+                this.fireBullet();
+            }
+        }
+    }
+
+    fireBullet() {
+        if (Date.now() - this.lastTimeFireBullet > 75) {
+            if (this.amunitionBullet <= 0) {
+                this.reloadBullet();
+                return;
+            }
+            this.lastTimeFireBullet = Date.now();
+            this.amunitionBullet--;
+            game.bullets.push(new Bullet());
+        }
+    }
+
+    reloadBullet() {
+        if (this.reloadingBullet) return;
+        setTimeout(() => {
+            this.amunitionBullet = 50;
+            this.reloadingBullet = false;
+        }, 1500);
+        this.reloadingBullet = true;
     }
 
     moveUpdate() {
@@ -279,6 +324,7 @@ class Game {
         this.rocks;
         this.meteors;
         this.missles;
+        this.bullets;
         this.weaponPackItem;
         this.time = 0;
         this.rockInterval;
@@ -322,6 +368,7 @@ class Game {
                 game.stop = false;
                 game.rocks = [];
                 game.meteors = [];
+                game.bullets = [];
                 game.boss = null;
                 game.time = 0;
                 game.rocket = new Rocket();
@@ -361,6 +408,14 @@ class Game {
     showLevel() {
         // show level
         levelWatch.innerHTML = `Level: ${this.levels.levelNumber}`;
+    }
+
+    resetArrays() {
+        game.rocks = [];
+        game.meteors = [];
+        game.missles = [];
+        game.bullets = [];
+        game.weaponPackItem = [];
     }
 
     newGame() {
@@ -437,6 +492,16 @@ class Game {
             }
         }, game);
 
+        // draw bullets
+        game.bullets.forEach(function (bullet) {
+            bullet.move();
+            bullet.checkCollision();
+            bullet.draw();
+            if (bullet.checkIfOutOfScreen()) {
+                game.bullets.splice(game.bullets.indexOf(bullet), 1);
+            }
+        }, game);
+
         // draw weapon pack item
         game.weaponPackItems.forEach(function (item) {
             item.move();
@@ -487,6 +552,19 @@ class Tutorial {
         this.readyToSkip = false;
         this.skipTutorial = false;
     }
+    gifEngine(array) {
+        array.forEach((item) => {
+            setTimeout(() => {
+                if (this.skipTutorial) return;
+                ctx.drawImage(
+                    item[0],
+                    canvas.width / 2 - item[0].width / 2,
+                    canvas.height / 2 - item[0].height / 2
+                );
+            }, this.time);
+            this.time += item[1];
+        });
+    }
     moveGif() {
         this.time = 0;
         this.basicTutorial = [
@@ -502,17 +580,8 @@ class Tutorial {
             [tutorialTextures.neutral, 750],
             [tutorialTextures.ready, 1250],
         ];
-        this.basicTutorial.forEach((item) => {
-            setTimeout(() => {
-                if (this.skipTutorial) return;
-                ctx.drawImage(
-                    item[0],
-                    canvas.width / 2 - item[0].width / 2,
-                    canvas.height / 2 - item[0].height / 2
-                );
-            }, this.time);
-            this.time += item[1];
-        });
+
+        this.gifEngine(this.basicTutorial);
 
         setTimeout(() => {
             this.readyToSkip = true;
@@ -613,6 +682,61 @@ class Missle {
     }
 }
 
+class Bullet {
+    constructor() {
+        this.bulletTexture = textures.bullet;
+        this.originalWidth = this.bulletTexture.width;
+        this.originalHeight = this.bulletTexture.height;
+        this.width = this.originalWidth / 30;
+        this.height = this.originalHeight / 30;
+        this.x = game.rocket.x + game.rocket.width / 2 - this.width / 2;
+        this.y = game.rocket.y - this.height;
+        this.yVelocity = 10;
+    }
+    draw() {
+        ctx.drawImage(
+            this.bulletTexture,
+            this.x,
+            this.y,
+            this.width,
+            this.height
+        );
+    }
+    move() {
+        this.y -= (this.yVelocity * game.deltaTime) / 7.5;
+    }
+    checkCollision() {
+        //check collision with rocks
+        for (let i = 0; i < game.rocks.length; i++) {
+            if (
+                game.rocks[i].x < this.x + this.width &&
+                game.rocks[i].x + game.rocks[i].width > this.x &&
+                game.rocks[i].y < this.y + this.height &&
+                game.rocks[i].y + game.rocks[i].height > this.y
+            ) {
+                game.bullets.splice(game.bullets.indexOf(this), 1);
+            }
+        }
+        //check collision with boss
+        if (!game.boss == null) {
+            if (
+                game.boss.x < this.x + this.width &&
+                game.boss.x + game.boss.width > this.x &&
+                game.boss.y < this.y + this.height &&
+                game.boss.y + game.boss.height > this.y
+            ) {
+                game.boss.health -= 5;
+                game.bullets.splice(game.bullets.indexOf(this), 1);
+            }
+        }
+    }
+    checkIfOutOfScreen() {
+        if (this.y < 0 - this.height) {
+            return true;
+        }
+    }
+}
+
 class Levels {
     constructor() {
         this.levelTime;
@@ -644,9 +768,7 @@ class Levels {
         this.levelNumber = 1;
         this.bossNumber = 1;
         this.bossHealth = 1000;
-        game.rocks = [];
-        game.meteors = [];
-        game.missles = [];
+        game.resetArrays();
         clearInterval(game.rockInterval);
         game.rockInterval = setInterval(() => {
             for (let i = canvas.width; i > 0; i -= 500)
@@ -661,9 +783,7 @@ class Levels {
         this.levelNumber = 2;
         this.bossNumber = 2;
         this.bossHealth = 2500;
-        game.rocks = [];
-        game.meteors = [];
-        game.missles = [];
+        game.resetArrays();
         clearInterval(game.rockInterval);
         game.rockInterval = setInterval(() => {
             for (let i = canvas.width; i > 0; i -= 500)
@@ -678,9 +798,7 @@ class Levels {
         this.levelNumber = 3;
         this.bossNumber = 3;
         this.bossHealth = 5000;
-        game.rocks = [];
-        game.meteors = [];
-        game.missles = [];
+        game.resetArrays();
         clearInterval(game.rockInterval);
         game.rockInterval = setInterval(() => {
             for (let i = canvas.width; i > 0; i -= 500)
@@ -695,9 +813,7 @@ class Levels {
         this.levelNumber = 4;
         this.bossNumber = 4;
         this.bossHealth = 12500;
-        game.rocks = [];
-        game.meteors = [];
-        game.missles = [];
+        game.resetArrays();
         clearInterval(game.rockInterval);
         game.rockInterval = setInterval(() => {
             for (let i = canvas.width; i > 0; i -= 400)
@@ -712,9 +828,7 @@ class Levels {
         this.levelNumber = 5;
         this.bossNumber = 5;
         this.bossHealth = 25000;
-        game.rocks = [];
-        game.meteors = [];
-        game.missles = [];
+        game.resetArrays();
         clearInterval(game.rockInterval);
         game.rockInterval = setInterval(() => {
             for (let i = canvas.width; i > 0; i -= 400)
@@ -734,7 +848,7 @@ class Boss {
         this.width = 100;
         this.height = 100;
         this.x = canvas.width / 2 - this.width / 2;
-        this.y = 50 + this.height;
+        this.y = 25 + this.height;
         this.xVelocity = 2;
         this.health = game.levels.bossHealth;
         this.maxHealth = this.health;
