@@ -749,16 +749,22 @@ class Levels {
         this.setLevel(1);
     }
     setLevel(number = 1) {
-        if (number == 1) {
-            this.level1();
-        } else if (number == 2) {
-            this.level2();
-        } else if (number == 3) {
-            this.level3();
-        } else if (number == 4) {
-            this.level4();
-        } else if (number == 5) {
-            this.level5();
+        switch (number) {
+            case 1:
+                this.level1();
+                break;
+            case 2:
+                this.level2();
+                break;
+            case 3:
+                this.level3();
+                break;
+            case 4:
+                this.level4();
+                break;
+            case 5:
+                this.level5();
+                break;
         }
     }
     level1() {
