@@ -606,6 +606,7 @@ class Game {
                 document.body.querySelector(
                     "#gameOverScreen"
                 ).style.visibility = "visible";
+                game.saveTime();
             }
             return;
         }
@@ -633,6 +634,7 @@ class Game {
                     document.body.querySelector(
                         "#gameOverScreen"
                     ).style.visibility = "visible";
+                    game.saveTime();
                 }
             });
     }
@@ -663,7 +665,6 @@ class Game {
         `;
         document.body.appendChild(gameOverScreen);
         game.askforNickname();
-        game.saveTime();
         document
             .getElementById("restartButton")
             .addEventListener("click", () => {
@@ -698,7 +699,6 @@ class Game {
         `;
         document.body.appendChild(gameOverScreen);
         game.askforNickname();
-        game.saveTime();
         document
             .getElementById("restartButton")
             .addEventListener("click", () => {
