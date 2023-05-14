@@ -6,6 +6,7 @@ h1 {
 }
 
 table {
+    display: none;
     margin: 0 auto;
     border-collapse: collapse;
 }
@@ -47,4 +48,33 @@ table tr td:nth-child(1) {
     h1 {
         font-size: 4vh;
     }
+}
+
+button {
+    font-size: 4vh;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 10px;
+    border: 1px solid white;
+    background-color: transparent;
+    color: white;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+    margin-bottom: 40px;
+}
+
+button:active {
+    transform: scale(0.85);
+}
+
+.activeButton {
+    background-color: white;
+    color: black;
+}
+
+.scoreboard {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
