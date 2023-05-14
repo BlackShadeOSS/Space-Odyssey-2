@@ -10,6 +10,7 @@ var textures = {
     missle: new Image(),
     weaponPackItem: new Image(),
     bullet: new Image(),
+    boss: new Image(),
 };
 {
     textures.pressEnter.src = "./Photos/pressEnter.png";
@@ -19,6 +20,7 @@ var textures = {
     textures.missle.src = "./Photos/missle.png";
     textures.weaponPackItem.src = "./Photos/weapon-pack.png";
     textures.bullet.src = "./Photos/bullet.png";
+    textures.boss.src = "./Photos/boss.png";
 }
 var texturesLoaded = false;
 var tutorialTextures = {
@@ -1025,11 +1027,11 @@ class Levels {
 
 class Boss {
     constructor() {
-        // this.bossTexture = textures.boss;
-        // this.originalWidth = this.bossTexture.width;
-        // this.originalHeight = this.bossTexture.height;
-        // this.width = this.originalWidth / 4;
-        // this.height = this.originalHeight / 4;
+        this.bossTexture = textures.boss;
+        this.originalWidth = this.bossTexture.width;
+        this.originalHeight = this.bossTexture.height;
+        this.width = this.originalWidth / 4;
+        this.height = this.originalHeight / 4;
         this.width = 100;
         this.height = 100;
         this.x = canvas.width / 2 - this.width / 2;
@@ -1040,16 +1042,13 @@ class Boss {
         clearInterval(game.rockInterval);
     }
     draw() {
-        // ctx.drawImage(
-        //     this.bossTexture,
-        //     this.x,
-        //     this.y,
-        //     this.width,
-        //     this.height
-        // );
-
-        ctx.fillStyle = "blue";
-        ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.drawImage(
+            this.bossTexture,
+            this.x,
+            this.y,
+            this.width,
+            this.height
+        );
 
         // add health bar
         ctx.fillStyle = "red";
