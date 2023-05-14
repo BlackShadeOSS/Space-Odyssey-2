@@ -1,16 +1,11 @@
 // dont work yet
 
-function getPlayerData(nickname) {
+function getPlayerProfile(nickname) {
     var nicknametosent = nickname.toString();
     var xhr = new XMLHttpRequest();
     xhr.open("GET", "http://drukara.ddns.net:4000/profile_data", true);
     xhr.setRequestHeader("Content-Type", "application/json");
     xhr.send(
-        JSON.stringify({
-            nickname: nicknametosent,
-        })
-    );
-    console.log(
         JSON.stringify({
             nickname: nicknametosent,
         })
