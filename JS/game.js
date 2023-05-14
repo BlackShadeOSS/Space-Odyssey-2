@@ -93,6 +93,35 @@ textures.rock.addEventListener("load", () => {
     }, 1500);
 });
 
+function checkCookie(name) {
+    let cookie = getCookie(name);
+    if (cookie == "") {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+function setCookie(cname, cvalue) {
+    document.cookie = cname + "=" + cvalue + ";" + ";path=/";
+}
+
+function getCookie(cname) {
+    let name = cname + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(";");
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == " ") {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
 window.addEventListener("keydown", (e) => {
     if (e.key == "Enter" && !game) {
         if (tutorialTexturesLoaded && !tutorial) {
@@ -404,6 +433,8 @@ class Game {
         game.missles = [];
         game.levelProgress = 0;
         game.timeOnThisLevel = 0;
+        game.deltaTime = Date.now();
+        game.lastTime = Date.now();
         game.levels = new Levels();
         game.rocket.rocketTexture = textures.rocket;
         game.render();
@@ -565,8 +596,8 @@ class Game {
                 document.getElementById("nicknameScreen")
             );
         }
-        if (document.cookie.includes("nickname")) {
-            game.nickname = document.cookie.split("=")[1];
+        if (checkCookie("nickname")) {
+            game.nickname = getCookie("nickname");
             if (document.body.querySelector("#gameOverScreen")) {
                 document.body.querySelector(
                     "#gameOverScreen"
@@ -592,7 +623,7 @@ class Game {
                 if (game.nickname == "") {
                     game.nickname = "Unknown";
                 }
-                document.cookie = `nickname=${game.nickname}`;
+                setCookie("nickname", game.nickname, 365);
                 document.body.removeChild(nicknameScreen);
                 if (document.body.querySelector("#gameOverScreen")) {
                     document.body.querySelector(
@@ -679,7 +710,7 @@ class Game {
 
     saveTime() {
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://127.0.0.1/saveTime.php", true);
+        xhr.open("POST", "http://drukara.ddns.net:4000/game_data", true);
         xhr.setRequestHeader("Content-Type", "application/json");
         xhr.send(
             JSON.stringify({
