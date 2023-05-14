@@ -1,5 +1,6 @@
 const canvas = document.getElementById("board");
 const ctx = canvas.getContext("2d");
+const withcanvas = document.querySelector(".withcanvas")[0];
 
 var textures = {
     pressEnter: new Image(),
@@ -184,8 +185,7 @@ class Rocket {
             if (this.hasWeaponPack) {
                 this.fireMissle();
             }
-        }
-        if (
+        } else if (
             keysActive.includes("w") ||
             (keysActive.includes("arrowup") && !this.reloadingBullet)
         ) {
@@ -307,6 +307,7 @@ class Rock {
                 this.y + this.height / 2
         ) {
             game.stop = true;
+            game.endGame();
         }
     }
 
@@ -336,6 +337,7 @@ class Game {
         this.levels;
         this.stop = false;
         this.godmode = false;
+        this.nickname;
     }
 
     addResizeListener() {
@@ -364,21 +366,7 @@ class Game {
         // reset game if letter "r" is pressed
         window.addEventListener("keydown", (e) => {
             if (e.key.toLowerCase() == "r") {
-                clearInterval(game.rockInterval);
-                game.stop = false;
-                game.rocks = [];
-                game.meteors = [];
-                game.bullets = [];
-                game.boss = null;
-                game.time = 0;
-                game.rocket = new Rocket();
-                game.weaponPackItem = [];
-                game.missles = [];
-                game.levelProgress = 0;
-                game.timeOnThisLevel = 0;
-                game.levels = new Levels();
-                game.rocket.rocketTexture = textures.rocket;
-                game.render();
+                this.restart();
             }
         });
     }
@@ -394,6 +382,31 @@ class Game {
             (Math.floor(this.time / 1000) - Math.floor(this.time / 60000) * 60)
                 .toString()
                 .padStart(2, "0");
+    }
+
+    restart() {
+        // remove warning message
+        if (document.querySelector(".warningSign"))
+            document.querySelector(".warningSign").remove();
+
+        // remove game over message
+        if (document.querySelector("#gameOverScreen"))
+            document.querySelector("#gameOverScreen").remove();
+        clearInterval(game.rockInterval);
+        game.stop = false;
+        game.rocks = [];
+        game.meteors = [];
+        game.bullets = [];
+        game.boss = null;
+        game.time = 0;
+        game.rocket = new Rocket();
+        game.weaponPackItem = [];
+        game.missles = [];
+        game.levelProgress = 0;
+        game.timeOnThisLevel = 0;
+        game.levels = new Levels();
+        game.rocket.rocketTexture = textures.rocket;
+        game.render();
     }
 
     updateProgressBar() {
@@ -538,12 +551,143 @@ class Game {
         );
         // spawn boss
         if (game.timeOnThisLevel > game.levels.levelTime) {
-            if (game.boss == null) {
+            if (game.boss == null && game.levels.bossNumber != null) {
                 game.boss = new Boss();
             }
         }
         // call render function again
         if (!game.stop) requestAnimationFrame(game.render);
+    }
+
+    askforNickname() {
+        if (document.getElementById("nicknameScreen")) {
+            document.body.removeChild(
+                document.getElementById("nicknameScreen")
+            );
+        }
+        if (document.cookie.includes("nickname")) {
+            game.nickname = document.cookie.split("=")[1];
+            if (document.body.querySelector("#gameOverScreen")) {
+                document.body.querySelector(
+                    "#gameOverScreen"
+                ).style.visibility = "visible";
+            }
+            return;
+        }
+        var nicknameScreen = document.createElement("div");
+        nicknameScreen.id = "nicknameScreen";
+        nicknameScreen.innerHTML = `
+        <div id="nicknameScreenContent">
+            <h1>Enter your nickname</h1>
+            <input type="text" id="nicknameInput" placeholder="Nickname" maxlength="15">
+            <br>
+            <button id="nicknameButton">Submit</button>
+        </div>
+        `;
+        document.body.appendChild(nicknameScreen);
+        document
+            .getElementById("nicknameButton")
+            .addEventListener("click", () => {
+                game.nickname = document.getElementById("nicknameInput").value;
+                if (game.nickname == "") {
+                    game.nickname = "Unknown";
+                }
+                document.cookie = `nickname=${game.nickname}`;
+                document.body.removeChild(nicknameScreen);
+                if (document.body.querySelector("#gameOverScreen")) {
+                    document.body.querySelector(
+                        "#gameOverScreen"
+                    ).style.visibility = "visible";
+                }
+            });
+    }
+
+    endGame() {
+        if (document.getElementById("gameOverScreen")) {
+            document.body.removeChild(
+                document.getElementById("gameOverScreen")
+            );
+        }
+        var gameOverScreen = document.createElement("div");
+        gameOverScreen.id = "gameOverScreen";
+        gameOverScreen.innerHTML = `
+        <div id="gameOverScreenContent">
+            <h1>Game Over</h1>
+            <h2>Level: ${game.levels.levelNumber}</h2>
+            <h2>Time: ${
+                Math.floor(this.time / 60000).toString() +
+                `minutes ` +
+                (
+                    Math.floor(this.time / 1000) -
+                    Math.floor(this.time / 60000) * 60
+                ).toString() +
+                `seconds`
+            } </h2>
+            <button id="restartButton">Restart</button>
+        </div>
+        `;
+        document.body.appendChild(gameOverScreen);
+        game.askforNickname();
+        game.saveTime();
+        document
+            .getElementById("restartButton")
+            .addEventListener("click", () => {
+                game.restart();
+            });
+    }
+
+    winGame() {
+        if (document.getElementById("gameOverScreen")) {
+            document.body.removeChild(
+                document.getElementById("gameOverScreen")
+            );
+        }
+        var gameOverScreen = document.createElement("div");
+        gameOverScreen.id = "gameOverScreen";
+        gameOverScreen.innerHTML = `
+        <div id="gameOverScreenContent">
+            <h1>You Win</h1>
+            <h2>Level: ${game.levels.levelNumber}</h2>
+            <h2>Time: ${
+                Math.floor(this.time / 60000).toString() +
+                `minutes ` +
+                (
+                    Math.floor(this.time / 1000) -
+                    Math.floor(this.time / 60000) * 60
+                ).toString() +
+                `seconds`
+            } </h2>
+            <button id="restartButton">Restart</button>
+            <button id="endless">Endless</button>
+        </div>
+        `;
+        document.body.appendChild(gameOverScreen);
+        game.askforNickname();
+        game.saveTime();
+        document
+            .getElementById("restartButton")
+            .addEventListener("click", () => {
+                game.restart();
+            });
+        document.getElementById("endless").addEventListener("click", () => {
+            game.stop = false;
+            game.render();
+            document.body.removeChild(gameOverScreen);
+            game.levels.setLevel(6);
+        });
+    }
+
+    saveTime() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://127.0.0.1/saveTime.php", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send(
+            JSON.stringify({
+                nickname: game.nickname,
+                level: game.levels.levelNumber,
+                time: game.time,
+            })
+        );
     }
 }
 
@@ -672,8 +816,6 @@ class Missle {
                 game.missles.splice(game.missles.indexOf(this), 1);
             }
         }
-        //check collision with boss
-        // not implemented yet
     }
     checkIfOutOfScreen() {
         if (this.y < 0 - this.height) {
@@ -717,18 +859,6 @@ class Bullet {
                 game.bullets.splice(game.bullets.indexOf(this), 1);
             }
         }
-        //check collision with boss
-        if (!game.boss == null) {
-            if (
-                game.boss.x < this.x + this.width &&
-                game.boss.x + game.boss.width > this.x &&
-                game.boss.y < this.y + this.height &&
-                game.boss.y + game.boss.height > this.y
-            ) {
-                game.boss.health -= 5;
-                game.bullets.splice(game.bullets.indexOf(this), 1);
-            }
-        }
     }
     checkIfOutOfScreen() {
         if (this.y < 0 - this.height) {
@@ -764,6 +894,9 @@ class Levels {
                 break;
             case 5:
                 this.level5();
+                break;
+            case 6:
+                this.level6();
                 break;
         }
     }
@@ -842,6 +975,21 @@ class Levels {
         }, this.rockIntervalTime);
         game.timeOnThisLevel = 0;
     }
+    level6() {
+        this.levelTime = 0;
+        this.rockIntervalTime = 250;
+        this.rockSpeed = 6.5;
+        this.levelNumber = 6;
+        this.bossNumber = null;
+        this.bossHealth = null;
+        game.resetArrays();
+        clearInterval(game.rockInterval);
+        game.rockInterval = setInterval(() => {
+            for (let i = canvas.width; i > 0; i -= 400)
+                if (!game.stop) game.rocks.push(new Rock(this.rockSpeed));
+        }, this.rockIntervalTime);
+        game.timeOnThisLevel = 0;
+    }
 }
 
 class Boss {
@@ -905,9 +1053,28 @@ class Boss {
                 this.health -= 250;
             }
         }
+        //check collision with bullets
+        for (let i = 0; i < game.bullets.length; i++) {
+            if (
+                game.bullets[i].x < this.x + this.width &&
+                game.bullets[i].x + game.bullets[i].width > this.x &&
+                game.bullets[i].y < this.y + this.height &&
+                game.bullets[i].y + game.bullets[i].height > this.y
+            ) {
+                game.bullets.splice(i, 1);
+                this.health -= 15;
+            }
+        }
     }
     checkIfDead() {
         if (this.health <= 0) {
+            if (game.levels.levelNumber === 5) {
+                game.stop = true;
+                game.levels.bossKilled = true;
+                game.boss = null;
+                game.winGame();
+                return;
+            }
             game.levels.bossKilled = true;
             game.levels.setLevel(game.levels.levelNumber + 1);
             game.boss = null;
