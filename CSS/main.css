@@ -187,7 +187,10 @@ p {
 .nav-list li {
     margin: 0;
     padding: 0;
-    margin-left: 20px;
+    border-left: #ffffff 4px solid;
+    border-right: #ffffff 4px solid;
+    transition: all 0.3s ease-in-out;
+    padding: 0 20px 0 20px;
 }
 
 .nav-list li a {
