@@ -1,0 +1,323 @@
+@font-face {
+    font-family: "Nasalization";
+    src: url("../Others/RetroGaming.woff2") format("woff2");
+    font-weight: normal;
+    font-style: normal;
+}
+
+body,
+html {
+    height: 125vh;
+    width: 100%;
+    margin: 0;
+    font-family: "Nasalization";
+    background-color: rgb(0, 0, 0);
+    background-image: url("./photos/tlo.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: relative;
+    color: white;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: 10000000;
+    height: 8vh;
+    background-color: #111111;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+.tlo {
+    width: 100%;
+    height: 100%;
+    background-image: url("./photos/tlo.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.logo {
+    margin: 0;
+    margin-left: 20px;
+    margin-right: 20px;
+    padding: 0;
+    width: 3.5em;
+    height: 3.5em;
+    z-index: 1000000;
+}
+
+.logozd {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.napis {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: normal;
+    font-size: 90px;
+    text-decoration: none;
+    text-align: center;
+    height: 92vh;
+    width: 100%;
+}
+
+p {
+    margin: 0;
+}
+
+.footer-basic {
+    padding: 40px 0;
+    background-color: #111111;
+    color: #ffffff;
+    display: block;
+    position: absolute;
+    text-align: center;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 5vh;
+}
+
+.footer-basic ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    opacity: 100%;
+    font-size: 18px;
+    line-height: 1.6;
+}
+
+.footer-basic li {
+    padding: 0;
+    color: rgb(255, 255, 255);
+    margin: 10px;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.footer-basic ul a {
+    color: inherit;
+    text-decoration: none;
+    opacity: 0.8;
+}
+
+.footer-basic ul a:hover {
+    opacity: 1;
+}
+
+.footer-basic .copyright {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 13px;
+    color: #aaa;
+    margin-bottom: 0;
+}
+
+.menu-toggle {
+    z-index: 1000000;
+    display: block;
+    cursor: pointer;
+    margin: 10px;
+    border: rgba(192, 192, 192, 0.75) 2px solid;
+    border-radius: 15px;
+    padding: 7px 5px 7px 5px;
+    transition: all 0.3s ease-in-out;
+}
+
+.menu-line {
+    width: 30px;
+    height: 3px;
+    background-color: white;
+    margin: 5px;
+    transition: all 0.3s ease-in-out;
+    border-radius: 5px;
+}
+/* make x from 3 lines when have class line-toggled */
+.menu-line.line-1.line-toggled {
+    transform: rotate(-45deg) translate(-5px, 6px);
+}
+
+.menu-line.line-2.line-toggled {
+    opacity: 0;
+}
+
+.menu-line.line-3.line-toggled {
+    transform: rotate(45deg) translate(-5px, -6px);
+}
+
+@media (min-width: 1000px) {
+    .menu-toggle {
+        display: none;
+    }
+    .nav-list {
+        display: none;
+    }
+}
+
+.nav-list {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 8vh;
+    z-index: 1000000;
+}
+
+.nav-list li {
+    margin: 0;
+    padding: 0;
+    margin-left: 20px;
+}
+
+.nav-list li a {
+    text-decoration: none;
+    color: white;
+    font-size: 30px;
+    font-weight: bold;
+    transition: color 0.3s ease-in-out;
+}
+
+.nav-list li a:hover {
+    color: dodgerblue;
+    text-decoration: underline dodgerblue;
+}
+
+@media (max-width: 500px) {
+    .napis {
+        font-size: 50px;
+    }
+}
+
+/* mobile menu */
+
+.mobile-menu {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50vh;
+    background-color: #111111;
+    z-index: 10000;
+}
+/* make a ease in anipation on open and out when closed */
+.mobile-menu.open {
+    animation: openMenu 0.5s ease-in-out forwards;
+}
+
+.mobile-menu.close {
+    display: block;
+    animation: closeMenu 0.5s ease-in-out forwards;
+}
+
+@keyframes openMenu {
+    0% {
+        transform: translateY(-100%);
+    }
+    100% {
+        transform: translateY(0%);
+    }
+}
+
+@keyframes closeMenu {
+    0% {
+        display: block;
+        transform: translateY(0%);
+    }
+    100% {
+        display: none;
+        transform: translateY(-100%);
+    }
+}
+
+.mobile-menu ul {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.mobile-menu ul li {
+    margin: 0;
+    padding: 0;
+    margin-bottom: 20px;
+}
+
+.mobile-menu ul li a {
+    text-decoration: none;
+    color: white;
+    font-size: 30px;
+    font-weight: bold;
+    transition: color 0.3s ease-in-out;
+}
+
+.mobile-menu ul li a:hover {
+    color: dodgerblue;
+    text-decoration: underline dodgerblue;
+}
+
+.mobile-menu ul li a:active {
+    color: dodgerblue;
+    text-decoration: underline dodgerblue;
+}
+
+.mobile-menu ul li a:focus {
+    color: dodgerblue;
+    text-decoration: underline dodgerblue;
+}
+
+@media (max-width: 1000px) {
+    .mobile-menu.open {
+        display: block;
+    }
+
+    .nav-list {
+        display: none;
+    }
+}
+
+@media (min-width: 1000px) {
+    .mobile-menu.open {
+        display: none;
+    }
+}
+
+@media (max-width: 500px) {
+    .mobile-menu ul li a {
+        font-size: 25px;
+    }
+}
+
+@media (max-width: 400px) {
+    .mobile-menu ul li a {
+        font-size: 20px;
+    }
+}

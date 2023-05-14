@@ -13,7 +13,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="icon" type="image/png" href="/photos/logo.png" />
         <script src="./JS/mainPackage.js" defer></script>
+        <script src="./JS/tableGeneration.js" defer></script>
         <link rel="stylesheet" href="./CSS/main.css" />
+        <link rel="stylesheet" href="./CSS/scoreboard.css" />
         <title>Space Odyssey 2</title>
     </head>
     <body>
@@ -33,7 +35,7 @@
                     <a href="game.html" class="nav-link">Game</a>
                 </li>
                 <li class="nav-item">
-                    <a href="" class="nav-link">Score Board</a>
+                    <a href="scoreboard.html" class="nav-link">ScoreBoard</a>
                 </li>
             </ul>
             <div class="menu-toggle">
@@ -62,8 +64,19 @@
                 </ul>
             </div>
         </nav>
-        <div class="napis">
-            <p>Space Odyssey 2</p>
+        <div class="scoreboard">
+            <h1>ScoreBoard</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Place</th>
+                        <th>Nickname</th>
+                        <th>Level</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
         <div class="footer-basic">
             <footer>

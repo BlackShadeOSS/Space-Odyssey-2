@@ -1,6 +1,7 @@
 const canvas = document.getElementById("board");
 const ctx = canvas.getContext("2d");
 const withcanvas = document.querySelector(".withcanvas")[0];
+const progressbar = document.querySelector(".progressBar");
 
 var textures = {
     pressEnter: new Image(),
@@ -56,6 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
     canvas.height = window.innerHeight * 0.8;
     if (window.innerWidth < 1200) {
         canvas.style.visibility = "hidden";
+        progressbar.style.display = "none";
         const h1 = document.createElement("h1");
         h1.innerHTML = "Please open this page on a bigger screen";
         h1.className = "warningSign";
