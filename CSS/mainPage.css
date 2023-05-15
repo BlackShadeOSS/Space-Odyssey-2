@@ -15,23 +15,25 @@ body::after {
 }
 
 /* add random rocks across body */
-body::before {
-    content: "";
-    position: absolute;
-    position: absolute;
-    width: 200%;
-    height: 200%;
-    top: -50%;
-    left: -50%;
-    background: url("../Photos/rock.png") 0 0 repeat;
-    background-size: 10%;
-    transform: rotate(-45deg);
-    z-index: 0;
-    filter: blur(10px);
-    opacity: 40%;
+@media (min-width: 1850px) {
+    body::before {
+        content: "";
+        position: absolute;
+        position: absolute;
+        width: 200%;
+        height: 200%;
+        top: -50%;
+        left: -50%;
+        background: url("../Photos/rock.png") 0 0 repeat;
+        background-size: 10%;
+        transform: rotate(-45deg);
+        z-index: 0;
+        filter: blur(10px);
+        opacity: 40%;
 
-    /* add animation to rocks */
-    animation: animate 50s linear infinite;
+        /* add animation to rocks */
+        animation: animate 50s linear infinite;
+    }
 }
 
 body {
