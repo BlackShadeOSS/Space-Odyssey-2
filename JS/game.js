@@ -295,8 +295,10 @@ class Rocket {
     }
 
     weaponPackUpgrade() {
-        this.rocketTexture = textures.rocketWithWeaponPack;
-        this.hasWeaponPack = true;
+        if (game.levels.timeOnThisLevel > 80000) {
+            this.rocketTexture = textures.rocketWithWeaponPack;
+            this.hasWeaponPack = true;
+        }
     }
 }
 
