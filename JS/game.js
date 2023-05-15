@@ -181,7 +181,9 @@ class Rocket {
 
     checkIfFireWeapon() {
         if (
-            keysActive.includes("w") ||
+            (keysActive.includes("w") &&
+                !this.reloadingMissle &&
+                keysActive.includes("shift")) ||
             (keysActive.includes("arrowup") &&
                 !this.reloadingMissle &&
                 keysActive.includes("shift"))
@@ -190,7 +192,7 @@ class Rocket {
                 this.fireMissle();
             }
         } else if (
-            keysActive.includes("w") ||
+            (keysActive.includes("w") && !this.reloadingBullet) ||
             (keysActive.includes("arrowup") && !this.reloadingBullet)
         ) {
             if (this.hasWeaponPack) {
@@ -697,6 +699,7 @@ class Game {
     }
 }
 
+//dorobić
 class Tutorial {
     constructor() {
         this.readyToSkip = false;
