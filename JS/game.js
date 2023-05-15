@@ -97,6 +97,37 @@ textures.rock.addEventListener("load", () => {
     }, 1500);
 });
 
+var nickname = "";
+
+() => {
+    if (document.getElementById("nicknameScreen")) {
+        document.body.removeChild(document.getElementById("nicknameScreen"));
+    }
+    if (checkCookie("nickname")) {
+        nickname = getCookie("nickname");
+        return;
+    }
+    var nicknameScreen = document.createElement("div");
+    nicknameScreen.id = "nicknameScreen";
+    nicknameScreen.innerHTML = `
+    <div id="nicknameScreenContent">
+        <h1>Enter your nickname</h1>
+        <input type="text" id="nicknameInput" placeholder="Nickname" maxlength="15">
+        <br>
+        <button id="nicknameButton">Submit</button>
+    </div>
+    `;
+    document.body.appendChild(nicknameScreen);
+    document.getElementById("nicknameButton").addEventListener("click", () => {
+        if (document.getElementById("nicknameInput").value == "") {
+            return;
+        }
+        nickname = document.getElementById("nicknameInput").value;
+        setCookie("nickname", nickname, 365);
+        document.body.removeChild(nicknameScreen);
+    });
+};
+
 window.addEventListener("keydown", (e) => {
     if (e.key == "Enter" && !game) {
         if (tutorialTexturesLoaded && !tutorial) {
@@ -343,7 +374,7 @@ class Game {
         this.levels;
         this.stop = false;
         this.godmode = false;
-        this.nickname;
+        this.nickname = nickname;
     }
 
     addResizeListener() {
@@ -567,51 +598,6 @@ class Game {
         if (!game.stop) requestAnimationFrame(game.render);
     }
 
-    askforNickname() {
-        if (document.getElementById("nicknameScreen")) {
-            document.body.removeChild(
-                document.getElementById("nicknameScreen")
-            );
-        }
-        if (checkCookie("nickname")) {
-            game.nickname = getCookie("nickname");
-            if (document.body.querySelector("#gameOverScreen")) {
-                document.body.querySelector(
-                    "#gameOverScreen"
-                ).style.visibility = "visible";
-                game.saveTime();
-            }
-            return;
-        }
-        var nicknameScreen = document.createElement("div");
-        nicknameScreen.id = "nicknameScreen";
-        nicknameScreen.innerHTML = `
-        <div id="nicknameScreenContent">
-            <h1>Enter your nickname</h1>
-            <input type="text" id="nicknameInput" placeholder="Nickname" maxlength="15">
-            <br>
-            <button id="nicknameButton">Submit</button>
-        </div>
-        `;
-        document.body.appendChild(nicknameScreen);
-        document
-            .getElementById("nicknameButton")
-            .addEventListener("click", () => {
-                game.nickname = document.getElementById("nicknameInput").value;
-                if (document.getElementById("nicknameInput").value == "") {
-                    return;
-                }
-                setCookie("nickname", game.nickname, 365);
-                document.body.removeChild(nicknameScreen);
-                if (document.body.querySelector("#gameOverScreen")) {
-                    document.body.querySelector(
-                        "#gameOverScreen"
-                    ).style.visibility = "visible";
-                    game.saveTime();
-                }
-            });
-    }
-
     endGame() {
         if (document.getElementById("gameOverScreen")) {
             document.body.removeChild(
@@ -637,7 +623,7 @@ class Game {
         </div>
         `;
         document.body.appendChild(gameOverScreen);
-        game.askforNickname();
+        game.saveTime();
         document
             .getElementById("restartButton")
             .addEventListener("click", () => {
@@ -671,7 +657,7 @@ class Game {
         </div>
         `;
         document.body.appendChild(gameOverScreen);
-        game.askforNickname();
+        game.saveTime();
         document
             .getElementById("restartButton")
             .addEventListener("click", () => {
