@@ -95,21 +95,21 @@ textures.rock.addEventListener("load", () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }, 750);
     }, 1500);
+    askForNickname();
 });
 
 var nickname = "";
 
-() => {
+function askForNickname() {
     if (document.getElementById("nicknameScreen")) {
         document.body.removeChild(document.getElementById("nicknameScreen"));
     }
-    if (checkCookie("nickname")) {
+    if (checkCookie("nickname") && getCookie("nickname") != "") {
         nickname = getCookie("nickname");
-        return;
-    }
-    var nicknameScreen = document.createElement("div");
-    nicknameScreen.id = "nicknameScreen";
-    nicknameScreen.innerHTML = `
+    } else {
+        var nicknameScreen = document.createElement("div");
+        nicknameScreen.id = "nicknameScreen";
+        nicknameScreen.innerHTML = `
     <div id="nicknameScreenContent">
         <h1>Enter your nickname</h1>
         <input type="text" id="nicknameInput" placeholder="Nickname" maxlength="15">
@@ -117,19 +117,26 @@ var nickname = "";
         <button id="nicknameButton">Submit</button>
     </div>
     `;
-    document.body.appendChild(nicknameScreen);
-    document.getElementById("nicknameButton").addEventListener("click", () => {
-        if (document.getElementById("nicknameInput").value == "") {
-            return;
-        }
-        nickname = document.getElementById("nicknameInput").value;
-        setCookie("nickname", nickname, 365);
-        document.body.removeChild(nicknameScreen);
-    });
-};
+        document.body.appendChild(nicknameScreen);
+        document
+            .getElementById("nicknameButton")
+            .addEventListener("click", () => {
+                if (document.getElementById("nicknameInput").value == "") {
+                    return;
+                }
+                nickname = document.getElementById("nicknameInput").value;
+                setCookie("nickname", nickname, 365);
+                document.body.removeChild(nicknameScreen);
+            });
+    }
+}
 
 window.addEventListener("keydown", (e) => {
-    if (e.key == "Enter" && !game) {
+    if (
+        e.key == "Enter" &&
+        !game &&
+        document.getElementById("nicknameScreen") == null
+    ) {
         if (tutorialTexturesLoaded && !tutorial) {
             tutorial = new Tutorial();
             tutorial.moveGif();
