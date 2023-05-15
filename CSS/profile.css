@@ -158,3 +158,8 @@ button:hover {
     background-color: rgb(255, 255, 255);
     color: rgb(0, 0, 0);
 }
+
+.footer-basic {
+    position: absolute;
+    bottom: 0;
+}

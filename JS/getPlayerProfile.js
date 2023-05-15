@@ -1,6 +1,6 @@
 function getPlayerProfile(nickname) {
     var nicknametosent = nickname.toString();
-    var best10gamesTable = document.getElementById("best10games");
+    var best5gamesTable = document.getElementById("best5games");
     var playerDataDiv = document.getElementById("playerData");
     var h2 = document.querySelector("h2");
     if (nicknametosent == "") {
@@ -11,12 +11,12 @@ function getPlayerProfile(nickname) {
             "<br>" +
             "<button onclick='createNewProfile()'>Create Profile</button>" +
             "<button onclick='createNewProfile()'>Log In</button>";
-        document.getElementById("best10games").style.display = "none";
+        document.getElementById("best5games").style.display = "none";
         h2.style.display = "none";
         return;
     }
     if (nicknametosent != "") {
-        document.getElementById("best10games").style.display = "block";
+        document.getElementById("best5games").style.display = "block";
         h2.style.display = "block";
     }
     var xhr = new XMLHttpRequest();
@@ -30,7 +30,7 @@ function getPlayerProfile(nickname) {
         if (xhr.readyState === 4 && xhr.status === 200) {
             var data = Object.values(JSON.parse(xhr.responseText));
             var playerData = { nickname: "", games: 0, totaltime: 0 };
-            var best10games = [];
+            var best5games = [];
 
             if (data.length == 0) {
                 playerDataDiv.innerHTML =
@@ -40,7 +40,7 @@ function getPlayerProfile(nickname) {
                     "<p>If you want to log out click the button below</p>" +
                     "<br>" +
                     "<button onclick='logOut()'>Log Out</button>";
-                document.getElementById("best10games").style.display = "none";
+                document.getElementById("best5games").style.display = "none";
                 h2.style.display = "none";
                 return;
             }
@@ -65,12 +65,12 @@ function getPlayerProfile(nickname) {
             playerData.totaltime = minutes + ":" + seconds;
 
             data.forEach(function (rowData) {
-                if (rowData.nickname == nickname && best10games.length < 10) {
-                    best10games.push(rowData);
+                if (rowData.nickname == nickname && best5games.length < 5) {
+                    best5games.push(rowData);
                 }
             });
 
-            best10games.forEach(function (rowData) {
+            best5games.forEach(function (rowData) {
                 var time = new Date(rowData.time);
                 var minutes = time.getMinutes().toString().padStart(2, "0");
                 var seconds = time.getSeconds().toString().padStart(2, "0");
@@ -92,8 +92,8 @@ function getPlayerProfile(nickname) {
                     "</u></p>" +
                     "<br><br>" +
                     "<button onclick='logOut()'>Log Out</button>";
-                best10games.forEach(function (rowData) {
-                    best10gamesTable.innerHTML +=
+                best5games.forEach(function (rowData) {
+                    best5gamesTable.innerHTML +=
                         "<tr>" +
                         "<td>" +
                         rowData.nickname +

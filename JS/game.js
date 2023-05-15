@@ -619,12 +619,12 @@ class Game {
             <h2>Level: ${game.levels.levelNumber}</h2>
             <h2>Time: ${
                 Math.floor(this.time / 60000).toString() +
-                `minutes ` +
+                ` minutes ` +
                 (
                     Math.floor(this.time / 1000) -
                     Math.floor(this.time / 60000) * 60
                 ).toString() +
-                `seconds`
+                ` seconds`
             } </h2>
             <button id="restartButton">Restart</button>
         </div>
@@ -652,12 +652,12 @@ class Game {
             <h2>Level: ${game.levels.levelNumber}</h2>
             <h2>Time: ${
                 Math.floor(this.time / 60000).toString() +
-                `minutes ` +
+                ` minutes ` +
                 (
                     Math.floor(this.time / 1000) -
                     Math.floor(this.time / 60000) * 60
                 ).toString() +
-                `seconds`
+                ` seconds`
             } </h2>
             <button id="restartButton">Restart</button>
             <button id="endless">Endless</button>
