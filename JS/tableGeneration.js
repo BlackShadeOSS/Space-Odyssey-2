@@ -52,7 +52,7 @@ function getData() {
 }
 
 // generate table in html
-function generateTable(tableData, _id) {
+function generateTable(tableData, id) {
     var table = document.createElement("table");
     table.innerHTML = `
     <table>
@@ -60,12 +60,12 @@ function generateTable(tableData, _id) {
         <tr>
             <th>Place</th>
             <th>Nickname</th>
-            ${_id == "table1-5" ? "<th>Level</th>" : ""}
+            ${id == "table1-5" ? "<th>Level</th>" : ""}
             <th>Time</th>
         </tr>
     </thead>
     </table>`;
-    table.setAttribute("_id", _id);
+    table.setAttribute("id", id);
     var tableBody = document.createElement("tbody");
 
     if (tableData.length == 0) {
@@ -92,7 +92,7 @@ function generateTable(tableData, _id) {
         });
     }
 
-    if (_id == "table1-5") {
+    if (id == "table1-5") {
         table.style.display = "block";
     }
 
@@ -113,8 +113,8 @@ window.addEventListener("load", function () {
 
 // swich between tables
 function switchTable() {
-    var table1 = document.getElementBy_id("table1-5");
-    var table6 = document.getElementBy_id("table6");
+    var table1 = document.getElementById("table1-5");
+    var table6 = document.getElementById("table6");
     if (buttons[1].classList.contains("activeButton")) {
         table1.style.display = "block";
         table6.style.display = "none";
