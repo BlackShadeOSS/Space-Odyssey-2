@@ -140,10 +140,12 @@ function switchTable() {
         table6.style.display = "none";
         buttons[0].classList.toggle("activeButton");
         buttons[1].classList.toggle("activeButton");
+        adaptFooter();
     } else if (buttons[0].classList.contains("activeButton")) {
         table1.style.display = "none";
         table6.style.display = "block";
         buttons[0].classList.toggle("activeButton");
         buttons[1].classList.toggle("activeButton");
+        adaptFooter();
     }
 }
