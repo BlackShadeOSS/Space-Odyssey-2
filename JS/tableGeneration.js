@@ -56,6 +56,15 @@ function getData() {
                 var seconds = time.getSeconds().toString().padStart(2, "0");
                 rowData.time = minutes + ":" + seconds;
             });
+
+            if (data.length > 25) {
+                data.splice(25);
+            }
+
+            if (level6data.length > 25) {
+                level6data.splice(25);
+            }
+
             generateTable(data, "table1-5");
             generateTable(level6data, "table6");
         }
