@@ -26,7 +26,7 @@ function getData() {
                 rowData,
                 index = data.indexOf(rowData)
             ) {
-                rowData.id = index + 1;
+                rowData._id = index + 1;
                 delete rowData.level;
 
                 //change miliseconds to minutes and seconds
@@ -35,9 +35,9 @@ function getData() {
                 var seconds = time.getSeconds().toString().padStart(2, "0");
                 rowData.time = minutes + ":" + seconds;
             });
-            //change id to place in table
+            //change _id to place in table
             data.forEach(function (rowData, index = data.indexOf(rowData)) {
-                rowData.id = index + 1;
+                rowData._id = index + 1;
 
                 //change miliseconds to minutes and seconds
                 var time = new Date(rowData.time);
@@ -52,7 +52,7 @@ function getData() {
 }
 
 // generate table in html
-function generateTable(tableData, id) {
+function generateTable(tableData, _id) {
     var table = document.createElement("table");
     table.innerHTML = `
     <table>
@@ -60,12 +60,12 @@ function generateTable(tableData, id) {
         <tr>
             <th>Place</th>
             <th>Nickname</th>
-            ${id == "table1-5" ? "<th>Level</th>" : ""}
+            ${_id == "table1-5" ? "<th>Level</th>" : ""}
             <th>Time</th>
         </tr>
     </thead>
     </table>`;
-    table.setAttribute("id", id);
+    table.setAttribute("_id", _id);
     var tableBody = document.createElement("tbody");
 
     if (tableData.length == 0) {
@@ -92,7 +92,7 @@ function generateTable(tableData, id) {
         });
     }
 
-    if (id == "table1-5") {
+    if (_id == "table1-5") {
         table.style.display = "block";
     }
 
@@ -113,8 +113,8 @@ window.addEventListener("load", function () {
 
 // swich between tables
 function switchTable() {
-    var table1 = document.getElementById("table1-5");
-    var table6 = document.getElementById("table6");
+    var table1 = document.getElementBy_id("table1-5");
+    var table6 = document.getElementBy_id("table6");
     if (buttons[1].classList.contains("activeButton")) {
         table1.style.display = "block";
         table6.style.display = "none";
