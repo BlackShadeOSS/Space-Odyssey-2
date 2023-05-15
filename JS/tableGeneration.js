@@ -22,6 +22,17 @@ function getData() {
                 return a.time - b.time;
             });
 
+            //sort data by time ascending if level is below 5 and decending if level 5 and by level from highest to lowest
+            data.sort(function (a, b) {
+                if (a.level < 5 && b.level < 5 && a.level == b.level) {
+                    return b.time - a.time;
+                } else if (a.level == 5 && b.level == 5) {
+                    return a.time - b.time;
+                } else {
+                    return b.level - a.level;
+                }
+            });
+
             level6data.forEach(function (
                 rowData,
                 index = data.indexOf(rowData)
