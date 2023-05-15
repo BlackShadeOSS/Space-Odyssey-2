@@ -12,8 +12,11 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="icon" type="image/png" href="Photos/logo.png" />
+        <script src="JS/cookiesAPI.js" defer></script>
         <script src="./JS/mainPackage.js" defer></script>
+        <script src="./JS/getPlayerProfile.js" defer></script>
         <link rel="stylesheet" href="./CSS/main.css" />
+        <link rel="stylesheet" href="./CSS/profile.css" />
         <title>Space Odyssey 2</title>
     </head>
     <body>
@@ -70,8 +73,17 @@
                 </ul>
             </div>
         </nav>
-        <div class="napis">
-            <p>In works</p>
+        <div class="profileContainer">
+            <h1>Player Profile</h1>
+            <div id="playerData"></div>
+            <h2>10 Best Games</h2>
+            <table id="best10games">
+                <tr>
+                    <th>NickName</th>
+                    <th>Level</th>
+                    <th>Time</th>
+                </tr>
+            </table>
         </div>
         <div class="footer-basic">
             <footer>

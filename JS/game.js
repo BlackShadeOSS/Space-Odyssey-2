@@ -97,35 +97,6 @@ textures.rock.addEventListener("load", () => {
     }, 1500);
 });
 
-function checkCookie(name) {
-    let cookie = getCookie(name);
-    if (cookie == "") {
-        return false;
-    } else {
-        return true;
-    }
-}
-
-function setCookie(cname, cvalue) {
-    document.cookie = cname + "=" + cvalue + ";" + ";path=/";
-}
-
-function getCookie(cname) {
-    let name = cname + "=";
-    let decodedCookie = decodeURIComponent(document.cookie);
-    let ca = decodedCookie.split(";");
-    for (let i = 0; i < ca.length; i++) {
-        let c = ca[i];
-        while (c.charAt(0) == " ") {
-            c = c.substring(1);
-        }
-        if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length);
-        }
-    }
-    return "";
-}
-
 window.addEventListener("keydown", (e) => {
     if (e.key == "Enter" && !game) {
         if (tutorialTexturesLoaded && !tutorial) {
@@ -625,8 +596,8 @@ class Game {
             .getElementById("nicknameButton")
             .addEventListener("click", () => {
                 game.nickname = document.getElementById("nicknameInput").value;
-                if (game.nickname == "") {
-                    game.nickname = "Unknown";
+                if (document.getElementById("nicknameInput").value == "") {
+                    return;
                 }
                 setCookie("nickname", game.nickname, 365);
                 document.body.removeChild(nicknameScreen);
