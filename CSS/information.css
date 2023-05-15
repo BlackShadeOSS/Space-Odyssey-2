@@ -1,0 +1,35 @@
+h1 {
+    font-size: 8vh;
+    margin: 30px 0 30px 0;
+    padding: 0;
+    text-align: center;
+    color: dodgerblue;
+}
+
+h2 {
+    font-size: 6vh;
+    margin: 30px 0 30px 0;
+    padding: 0;
+    color: dodgerblue;
+    text-align: center;
+}
+
+p {
+    margin: 0;
+    font-size: 4vh;
+    width: 60%;
+    text-align: center;
+}
+
+@media (max-width: 1000px) {
+    h1 {
+        font-size: 4vh;
+    }
+}
+
+.informationContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
