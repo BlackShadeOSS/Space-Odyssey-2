@@ -1,9 +1,17 @@
 const canvas = document.getElementById("board");
 const ctx = canvas.getContext("2d");
-const inventory = document.getElementById("inventory");
-const ctxInv = inventory.getContext("2d");
+const inventoryCanvas = document.getElementById("inventory");
+const ctxInventory = inventoryCanvas.getContext("2d");
 const withcanvas = document.querySelector(".withcanvas")[0];
 const progressbar = document.querySelector(".progressBar");
+var retro = new FontFace("retro", "url(../Others/RetroGaming.woff2)");
+
+retro.load().then(function (font) {
+    // with canvas, if this is ommited won't work
+    document.fonts.add(font);
+
+    console.log("Font loaded");
+});
 
 var textures = {
     pressEnter: new Image(),
@@ -49,6 +57,7 @@ var tutorialTextures = {
     var keysActive;
     var game;
     var tutorial;
+    var inventory;
     var stopwatch;
     var levelWatch;
     var levelProgressBar;
@@ -57,6 +66,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // Set canvas size to 80% window size
     canvas.width = window.innerWidth * 0.725;
     canvas.height = window.innerHeight * 0.8;
+    inventoryCanvas.width = window.innerWidth * 0.125;
+    inventoryCanvas.height = window.innerHeight * 0.8;
     if (window.innerWidth < 1200) {
         canvas.style.visibility = "hidden";
         progressbar.style.display = "none";
@@ -147,6 +158,7 @@ window.addEventListener("keydown", (e) => {
     if (e.key == "Enter" && tutorial && tutorial.readyToSkip && !game) {
         tutorial.skipTutorial = true;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        inventory = new Inventory();
         game = new Game();
         game.newGame();
     }
@@ -167,10 +179,14 @@ class Rocket {
         this.hasWeaponPack = false;
         this.lastTimeFireMissle = 0;
         this.amunitionMissle = 4;
+        this.maxAmunitionMissle = 4;
         this.reloadingMissle = false;
         this.lastTimeFireBullet = 0;
         this.amunitionBullet = 50;
+        this.maxAmunitionBullet = 50;
         this.reloadingBullet = false;
+        this.health = 100;
+        this.maxHealth = 100;
         keysActive = [];
     }
 
@@ -199,13 +215,19 @@ class Rocket {
     fireMissle() {
         if (this.hasWeaponPack) {
             if (Date.now() - this.lastTimeFireMissle > 500) {
-                if (this.amunitionMissle <= 0) {
+                if (this.amunitionMissle <= 1) {
+                    if (this.reloadingMissle) return;
+                    if (this.amunitionMissle <= 0) return;
+                    this.lastTimeFireMissle = Date.now();
+                    this.amunitionMissle--;
+                    game.missles.push(new Missle());
                     this.reloadMissle();
                     return;
+                } else {
+                    this.lastTimeFireMissle = Date.now();
+                    this.amunitionMissle--;
+                    game.missles.push(new Missle());
                 }
-                this.lastTimeFireMissle = Date.now();
-                this.amunitionMissle--;
-                game.missles.push(new Missle());
             }
         }
     }
@@ -213,7 +235,7 @@ class Rocket {
     reloadMissle() {
         if (this.reloadingMissle) return;
         setTimeout(() => {
-            this.amunitionMissle = 4;
+            this.amunitionMissle = this.maxAmunitionMissle;
             this.reloadingMissle = false;
         }, 2500);
         this.reloadingMissle = true;
@@ -242,21 +264,29 @@ class Rocket {
     }
 
     fireBullet() {
-        if (Date.now() - this.lastTimeFireBullet > 75) {
-            if (this.amunitionBullet <= 0) {
-                this.reloadBullet();
-                return;
+        if (this.hasWeaponPack) {
+            if (Date.now() - this.lastTimeFireBullet > 75) {
+                if (this.amunitionBullet <= 1) {
+                    if (this.reloadingBullet) return;
+                    if (this.amunitionBullet <= 0) return;
+                    this.lastTimeFireBullet = Date.now();
+                    this.amunitionBullet--;
+                    game.bullets.push(new Bullet());
+                    this.reloadBullet();
+                    return;
+                } else {
+                    this.lastTimeFireBullet = Date.now();
+                    this.amunitionBullet--;
+                    game.bullets.push(new Bullet());
+                }
             }
-            this.lastTimeFireBullet = Date.now();
-            this.amunitionBullet--;
-            game.bullets.push(new Bullet());
         }
     }
 
     reloadBullet() {
         if (this.reloadingBullet) return;
         setTimeout(() => {
-            this.amunitionBullet = 50;
+            this.amunitionBullet = this.maxAmunitionBullet;
             this.reloadingBullet = false;
         }, 1500);
         this.reloadingBullet = true;
@@ -342,6 +372,8 @@ class Rock {
             game.rocket.y + game.rocket.height / 2 + this.height / 2 >
                 this.y + this.height / 2
         ) {
+            game.rocket.health = 0;
+            inventory.render();
             game.stop = true;
             game.endGame();
         }
@@ -374,6 +406,7 @@ class Game {
         this.stop = false;
         this.godmode = false;
         this.nickname = nickname;
+        this.items = [];
     }
 
     addResizeListener() {
@@ -468,6 +501,7 @@ class Game {
         game.missles = [];
         game.bullets = [];
         game.weaponPackItem = [];
+        game.items = [];
     }
 
     newGame() {
@@ -508,6 +542,9 @@ class Game {
 
         // update progress bar
         game.updateProgressBar();
+
+        // render inventory
+        inventory.render();
 
         // caltuclate fps
         game.fps = 1 / game.deltaTime;
@@ -1133,4 +1170,148 @@ class Boss {
 
 class Inventory {
     constructor() {}
+
+    render() {
+        // clear inventory canvas
+        ctxInventory.clearRect(
+            0,
+            0,
+            inventoryCanvas.width,
+            inventoryCanvas.height
+        );
+
+        // show rocket health
+        this.showRocketHealth();
+
+        // show rocket weapon pack
+        this.showRocketWeaponPack();
+
+        // show bullet ammunition
+        this.showBulletAmmunition();
+
+        // show missle ammunition
+        this.showMissleAmmunition();
+    }
+
+    // show rocket health using inventory canvas using numbers in RetroGaming font of size 3vh and bar
+    showRocketHealth() {
+        // show rocket health
+        ctxInventory.font = "2vh retro";
+        ctxInventory.fillStyle = "white";
+        ctxInventory.fillText(
+            `Health: ${
+                game.rocket.health.toString() +
+                `/` +
+                game.rocket.maxHealth.toString()
+            }`,
+            inventoryCanvas.width * 0.05,
+            inventoryCanvas.height * 0.15
+        );
+        // show rocket health bar
+        ctxInventory.fillStyle = "red";
+        ctxInventory.fillRect(
+            inventoryCanvas.width * 0.05,
+            inventoryCanvas.height * 0.175,
+            inventoryCanvas.width * 0.9,
+            inventoryCanvas.height * 0.025
+        );
+
+        ctxInventory.fillStyle = "green";
+        ctxInventory.fillRect(
+            inventoryCanvas.width * 0.05,
+            inventoryCanvas.height * 0.175,
+            (inventoryCanvas.width * 0.9 * game.rocket.health) /
+                game.rocket.maxHealth,
+            inventoryCanvas.height * 0.025
+        );
+    }
+
+    // show rocket weapon pack
+    showRocketWeaponPack() {
+        // show rocket weapon pack
+        ctxInventory.font = "1.45vh retro";
+        ctxInventory.fillStyle = "white";
+        ctxInventory.fillText(
+            `Weapon Pack: ${game.rocket.hasWeaponPack ? "Installed" : "None"}`,
+            inventoryCanvas.width * 0.05,
+            inventoryCanvas.height * 0.3
+        );
+    }
+
+    // show ammo using inventory
+    showBulletAmmunition() {
+        if (game.rocket.hasWeaponPack) {
+            // show bullet ammunition
+            ctxInventory.font = "1.75vh retro";
+            ctxInventory.fillStyle = "white";
+            if (game.rocket.reloadingBullet) {
+                ctxInventory.fillText(
+                    `Ammo: Reloading...`,
+                    inventoryCanvas.width * 0.05,
+                    inventoryCanvas.height * 0.35
+                );
+            } else {
+                ctxInventory.fillText(
+                    `Ammo: ${game.rocket.amunitionBullet.toString()}`,
+                    inventoryCanvas.width * 0.05,
+                    inventoryCanvas.height * 0.35
+                );
+            }
+            // show bullet ammunition bar
+            ctxInventory.fillStyle = "gray";
+            ctxInventory.fillRect(
+                inventoryCanvas.width * 0.05,
+                inventoryCanvas.height * 0.375,
+                inventoryCanvas.width * 0.9,
+                inventoryCanvas.height * 0.025
+            );
+
+            ctxInventory.fillStyle = "yellow";
+            ctxInventory.fillRect(
+                inventoryCanvas.width * 0.05,
+                inventoryCanvas.height * 0.375,
+                (inventoryCanvas.width * 0.9 * game.rocket.amunitionBullet) /
+                    game.rocket.maxAmunitionBullet,
+                inventoryCanvas.height * 0.025
+            );
+        }
+    }
+    // show missle using inventory
+    showMissleAmmunition() {
+        if (game.rocket.hasWeaponPack) {
+            // show missle ammunition
+            ctxInventory.font = "1.75vh retro";
+            ctxInventory.fillStyle = "white";
+            if (game.rocket.reloadingMissle) {
+                ctxInventory.fillText(
+                    `Missle: Reloading...`,
+                    inventoryCanvas.width * 0.05,
+                    inventoryCanvas.height * 0.45
+                );
+            } else {
+                ctxInventory.fillText(
+                    `Missle: ${game.rocket.amunitionMissle.toString()}`,
+                    inventoryCanvas.width * 0.05,
+                    inventoryCanvas.height * 0.45
+                );
+            }
+            // show missle ammunition bar
+            ctxInventory.fillStyle = "gray";
+            ctxInventory.fillRect(
+                inventoryCanvas.width * 0.05,
+                inventoryCanvas.height * 0.475,
+                inventoryCanvas.width * 0.9,
+                inventoryCanvas.height * 0.025
+            );
+
+            ctxInventory.fillStyle = "orange";
+            ctxInventory.fillRect(
+                inventoryCanvas.width * 0.05,
+                inventoryCanvas.height * 0.475,
+                (inventoryCanvas.width * 0.9 * game.rocket.amunitionMissle) /
+                    game.rocket.maxAmunitionMissle,
+                inventoryCanvas.height * 0.025
+            );
+        }
+    }
 }
