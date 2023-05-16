@@ -22,6 +22,7 @@ var textures = {
     weaponPackItem: new Image(),
     bullet: new Image(),
     boss: new Image(),
+    h2Canister: new Image(),
 };
 {
     textures.pressEnter.src = "./Photos/pressEnter.png";
@@ -32,6 +33,7 @@ var textures = {
     textures.weaponPackItem.src = "./Photos/weapon-pack.png";
     textures.bullet.src = "./Photos/bullet.png";
     textures.boss.src = "./Photos/boss.png";
+    textures.h2Canister.src = "./Photos/h2canister.png";
 }
 var texturesLoaded = false;
 var tutorialTextures = {
@@ -407,6 +409,8 @@ class Game {
         this.godmode = false;
         this.nickname = nickname;
         this.items = [];
+        this.fallingItems = [];
+        this.lastTimeSpawnItem = Date.now();
     }
 
     addResizeListener() {
@@ -477,6 +481,10 @@ class Game {
         game.deltaTime = Date.now();
         game.lastTime = Date.now();
         game.levels = new Levels();
+        game.fallingItems = [];
+        game.items = [];
+        game.godmode = false;
+        game.lastTimeSpawnItem = Date.now();
         game.rocket.rocketTexture = textures.rocket;
         game.render();
     }
@@ -502,6 +510,7 @@ class Game {
         game.bullets = [];
         game.weaponPackItem = [];
         game.items = [];
+        game.fallingItems = [];
     }
 
     newGame() {
@@ -634,6 +643,23 @@ class Game {
                 game.boss = new Boss();
             }
         }
+
+        // render falling items
+        game.fallingItems.forEach(function (item) {
+            item.move();
+            item.draw();
+            item.checkCollision();
+            if (item.checkIfOutOfScreen()) {
+                game.fallingItems.splice(game.fallingItems.indexOf(item), 1);
+            }
+        }, game);
+
+        // spawn random item every 1 minute
+        if (Date.now() - game.lastTimeSpawnItem > 60000 * 2) {
+            game.randomItem();
+            game.lastTimeSpawnItem = Date.now();
+        }
+
         // call render function again
         if (!game.stop) requestAnimationFrame(game.render);
     }
@@ -758,6 +784,28 @@ class Game {
                 game.rocket.x = canvas.width / 2 - game.rocket.width / 2;
                 game.render();
             });
+    }
+
+    randomItem() {
+        if (Math.floor(Math.random() * 100) < 10) {
+            // 15% chance for each item to spawn
+            // switch (Math.floor(Math.random() * 6)) {
+            //     case 0:
+            //         this.fallingItems.push(new h2CanisterPowerUp());
+            //         break;
+            //     case 1:
+            //         break;
+            //     case 2:
+            //         break;
+            //     case 3:
+            //         break;
+            //     case 4:
+            //         break;
+            //     case 5:
+            //         break;
+            // }
+            this.fallingItems.push(new h2CanisterPowerUp());
+        }
     }
 }
 
@@ -1169,7 +1217,9 @@ class Boss {
 }
 
 class Inventory {
-    constructor() {}
+    constructor() {
+        this.addListenerToItemSlot();
+    }
 
     render() {
         // clear inventory canvas
@@ -1191,6 +1241,9 @@ class Inventory {
 
         // show missle ammunition
         this.showMissleAmmunition();
+
+        // render grid
+        this.renderGrid();
     }
 
     // show rocket health using inventory canvas using numbers in RetroGaming font of size 3vh and bar
@@ -1313,5 +1366,184 @@ class Inventory {
                 inventoryCanvas.height * 0.025
             );
         }
+    }
+
+    //render even grid of 3x3 grid with white border and dark gray backgrout im the inventory canvas with items in the grid from game.items array
+    renderGrid() {
+        // render name
+        ctxInventory.font = "1.75vh retro";
+        ctxInventory.fillStyle = "white";
+        ctxInventory.fillText(
+            `Inventory`,
+            inventoryCanvas.width * 0.05,
+            inventoryCanvas.height * 0.55
+        );
+
+        // render grid
+        ctxInventory.fillStyle = "gray";
+        ctxInventory.fillRect(
+            inventoryCanvas.width * 0.05,
+            inventoryCanvas.height * 0.6,
+            inventoryCanvas.height * 0.275,
+            inventoryCanvas.height * 0.275
+        );
+
+        // render grid border
+        ctxInventory.strokeStyle = "white";
+        ctxInventory.lineWidth = 5;
+        ctxInventory.strokeRect(
+            inventoryCanvas.width * 0.05,
+            inventoryCanvas.height * 0.6,
+            inventoryCanvas.height * 0.275,
+            inventoryCanvas.height * 0.275
+        );
+
+        // render inside grid frame border in white
+        ctxInventory.strokeStyle = "white";
+        ctxInventory.lineWidth = 5;
+        ctxInventory.strokeRect(
+            inventoryCanvas.width * 0.05,
+            inventoryCanvas.height * 0.6,
+            (inventoryCanvas.height * 0.275) / 3,
+            (inventoryCanvas.height * 0.275) / 3
+        );
+        ctxInventory.strokeRect(
+            inventoryCanvas.width * 0.05 + (inventoryCanvas.height * 0.275) / 3,
+            inventoryCanvas.height * 0.6,
+            (inventoryCanvas.height * 0.275) / 3,
+            (inventoryCanvas.height * 0.275) / 3
+        );
+        ctxInventory.strokeRect(
+            inventoryCanvas.width * 0.05 +
+                ((inventoryCanvas.height * 0.275) / 3) * 2,
+            inventoryCanvas.height * 0.6,
+            (inventoryCanvas.height * 0.275) / 3,
+            (inventoryCanvas.height * 0.275) / 3
+        );
+        ctxInventory.strokeRect(
+            inventoryCanvas.width * 0.05,
+            inventoryCanvas.height * 0.6 + (inventoryCanvas.height * 0.275) / 3,
+            (inventoryCanvas.height * 0.275) / 3,
+            (inventoryCanvas.height * 0.275) / 3
+        );
+        ctxInventory.strokeRect(
+            inventoryCanvas.width * 0.05 + (inventoryCanvas.height * 0.275) / 3,
+            inventoryCanvas.height * 0.6 + (inventoryCanvas.height * 0.275) / 3,
+            (inventoryCanvas.height * 0.275) / 3,
+            (inventoryCanvas.height * 0.275) / 3
+        );
+        ctxInventory.strokeRect(
+            inventoryCanvas.width * 0.05 +
+                ((inventoryCanvas.height * 0.275) / 3) * 2,
+            inventoryCanvas.height * 0.6 + (inventoryCanvas.height * 0.275) / 3,
+            (inventoryCanvas.height * 0.275) / 3,
+            (inventoryCanvas.height * 0.275) / 3
+        );
+        ctxInventory.strokeRect(
+            inventoryCanvas.width * 0.05,
+            inventoryCanvas.height * 0.6 +
+                ((inventoryCanvas.height * 0.275) / 3) * 2,
+            (inventoryCanvas.height * 0.275) / 3,
+            (inventoryCanvas.height * 0.275) / 3
+        );
+        ctxInventory.strokeRect(
+            inventoryCanvas.width * 0.05 + (inventoryCanvas.height * 0.275) / 3,
+            inventoryCanvas.height * 0.6 +
+                ((inventoryCanvas.height * 0.275) / 3) * 2,
+            (inventoryCanvas.height * 0.275) / 3,
+            (inventoryCanvas.height * 0.275) / 3
+        );
+        ctxInventory.strokeRect(
+            inventoryCanvas.width * 0.05 +
+                ((inventoryCanvas.height * 0.275) / 3) * 2,
+            inventoryCanvas.height * 0.6 +
+                ((inventoryCanvas.height * 0.275) / 3) * 2,
+            (inventoryCanvas.height * 0.275) / 3,
+            (inventoryCanvas.height * 0.275) / 3
+        );
+
+        // add small number in the corner of the grid item
+        ctxInventory.font = "2vh retro";
+        ctxInventory.fillStyle = "white";
+        // render grid items numbers using loop
+        for (let i = 0; i < 9; i++) {
+            ctxInventory.fillText(
+                (i + 1).toString(),
+                inventoryCanvas.width * 0.05 +
+                    ((inventoryCanvas.height * 0.275) / 3) * (i % 3) +
+                    5,
+                inventoryCanvas.height * 0.6 +
+                    ((inventoryCanvas.height * 0.275) / 3) * Math.floor(i / 3) +
+                    inventoryCanvas.height * 0.0275
+            );
+        }
+
+        // render grid items from game.items array in the grid
+        for (let i = 0; i < game.items.length; i++) {
+            ctxInventory.drawImage(
+                game.items[i].texture,
+                inventoryCanvas.width * 0.05 +
+                    ((inventoryCanvas.height * 0.275) / 3) * (i % 3) +
+                    5,
+                inventoryCanvas.height * 0.6 +
+                    ((inventoryCanvas.height * 0.275) / 3) * Math.floor(i / 3) +
+                    5,
+                (inventoryCanvas.height * 0.275) / 3 - 10,
+                (inventoryCanvas.height * 0.275) / 3 - 10
+            );
+        }
+    }
+
+    // add keyboard number listener to item slot in the inventory
+    addListenerToItemSlot() {
+        document.addEventListener("keydown", (event) => {
+            if (event.key >= 1 && event.key <= 9) {
+                if (game.items[event.key - 1]) {
+                    game.items[event.key - 1].use();
+                    game.items.splice(event.key - 1, 1);
+                }
+            }
+        });
+    }
+}
+
+class h2CanisterPowerUp {
+    constructor() {
+        this.texture = textures.h2Canister;
+        this.originalWidth = this.texture.width;
+        this.originalHeight = this.texture.height;
+        this.width = this.originalWidth / 8;
+        this.height = this.originalHeight / 8;
+        this.x = Math.floor(Math.random() * (canvas.width - this.width));
+        this.y = -(this.height + 10 * game.levels.rockSpeed);
+        this.yVelocity = game.levels.rockSpeed;
+    }
+    draw() {
+        ctx.drawImage(this.texture, this.x, this.y, this.width, this.height);
+    }
+    move() {
+        this.y += (this.yVelocity * game.deltaTime) / 7.5;
+    }
+    checkCollision() {
+        if (
+            game.rocket.x < this.x + this.width &&
+            game.rocket.x + game.rocket.width > this.x &&
+            game.rocket.y < this.y + this.height &&
+            game.rocket.y + game.rocket.height > this.y
+        ) {
+            if (game.items.length < 9) {
+                game.items.push(new h2CanisterPowerUp());
+            }
+            game.fallingItems.splice(game.fallingItems.indexOf(this), 1);
+        }
+    }
+    checkIfOutOfScreen() {
+        if (this.y > canvas.height) {
+            return true;
+        }
+    }
+
+    use() {
+        game.rocks = [];
     }
 }
