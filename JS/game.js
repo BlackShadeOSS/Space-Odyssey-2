@@ -4,7 +4,7 @@ const inventoryCanvas = document.getElementById("inventory");
 const ctxInventory = inventoryCanvas.getContext("2d");
 const withcanvas = document.querySelector(".withcanvas")[0];
 const progressbar = document.querySelector(".progressBar");
-var retro = new FontFace("retro", "url(../Others/RetroGaming.woff2)");
+var retro = new FontFace("retro", "url(Others/RetroGaming.woff2)");
 
 retro.load().then(function (font) {
     // with canvas, if this is ommited won't work
