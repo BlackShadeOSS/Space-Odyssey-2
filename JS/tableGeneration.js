@@ -1,11 +1,22 @@
 // use xhr to dowload data in json format form server and generate table in html
 const scoreboard = document.querySelector(".scoreboard");
 const buttons = document.querySelectorAll(".switchButton");
-// get data from server
-function getData() {
+// get data from server if it is available if not swich to other server
+function getData(server = "main") {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", "http://drukara.ddns.net:4000/game_data", true);
+    if (server == "main") {
+        xhr.open("GET", "http://drukara.ddns.net:4000/game_data", true);
+    } else if (server == "backup") {
+        xhr.open(
+            "GET",
+            "https://space-odyssey-2-dataserver.diaxsio10.repl.co/game_data",
+            true
+        );
+    }
     xhr.send();
+    xhr.onerror = () => {
+        getData("backup");
+    };
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
             var data = Object.values(JSON.parse(xhr.responseText));

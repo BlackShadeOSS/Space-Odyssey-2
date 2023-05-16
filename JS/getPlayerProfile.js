@@ -1,4 +1,4 @@
-function getPlayerProfile(nickname) {
+function getPlayerProfile(nickname, server = "main") {
     var nicknametosent = nickname.toString();
     var best5gamesTable = document.getElementById("best5games");
     var playerDataDiv = document.getElementById("playerData");
@@ -20,12 +20,25 @@ function getPlayerProfile(nickname) {
         h2.style.display = "block";
     }
     var xhr = new XMLHttpRequest();
-    xhr.open(
-        "GET",
-        "http://drukara.ddns.net:4000/profile_data?nickname=" + nicknametosent,
-        true
-    );
+    if (server == "main") {
+        xhr.open(
+            "GET",
+            "http://drukara.ddns.net:4000/profile_data?nickname=" +
+                nicknametosent,
+            true
+        );
+    } else if (server == "backup") {
+        xhr.open(
+            "GET",
+            "https://space-odyssey-2-dataserver.diaxsio10.repl.co/profile_data?nickname=" +
+                nicknametosent,
+            true
+        );
+    }
     xhr.send();
+    xhr.onerror = () => {
+        getPlayerProfile(nickname, "backup");
+    };
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
             var data = Object.values(JSON.parse(xhr.responseText));
