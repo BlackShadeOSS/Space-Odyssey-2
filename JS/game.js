@@ -295,7 +295,7 @@ class Rocket {
     }
 
     weaponPackUpgrade() {
-        if (game.levels.timeOnThisLevel > 80000) {
+        if (game.timeOnThisLevel > 5000) {
             this.rocketTexture = textures.rocketWithWeaponPack;
             this.hasWeaponPack = true;
         }
@@ -598,7 +598,13 @@ class Game {
             (game.timeOnThisLevel / game.levels.levelTime) * 100
         );
         // spawn boss
-        if (game.timeOnThisLevel > game.levels.levelTime) {
+        if (
+            game.timeOnThisLevel > game.levels.levelTime &&
+            game.boss == null &&
+            game.levels.bossNumber != null &&
+            game.levels.levelNumber != 6 &&
+            game.levels.bossKilled == false
+        ) {
             if (game.boss == null && game.levels.bossNumber != null) {
                 game.boss = new Boss();
             }
@@ -691,6 +697,42 @@ class Game {
                 time: game.time,
             })
         );
+    }
+
+    pauseBetweenLevels() {
+        if (document.getElementById("pauseScreen")) {
+            document.body.removeChild(document.getElementById("pauseScreen"));
+        }
+        var pauseScreen = document.createElement("div");
+        game.stop = true;
+        pauseScreen.id = "pauseScreen";
+        pauseScreen.innerHTML = `
+        <div id="pauseScreenContent">
+            <h1>Level ${game.levels.levelNumber} completed</h1>
+            <h2>Time: ${
+                Math.floor(this.time / 60000).toString() +
+                ` minutes ` +
+                (
+                    Math.floor(this.time / 1000) -
+                    Math.floor(this.time / 60000) * 60
+                ).toString() +
+                ` seconds`
+            } </h2>
+            <button id="nextLevelButton">Next Level</button>
+        </div>
+        `;
+        document.body.appendChild(pauseScreen);
+        document
+            .getElementById("nextLevelButton")
+            .addEventListener("click", () => {
+                game.resetArrays();
+                game.levels.setLevel(game.levels.levelNumber + 1);
+                document.body.removeChild(pauseScreen);
+                game.stop = false;
+                game.Boss = null;
+                game.rocket.x = canvas.width / 2 - game.rocket.width / 2;
+                game.render();
+            });
     }
 }
 
@@ -1077,8 +1119,8 @@ class Boss {
                 return;
             }
             game.levels.bossKilled = true;
-            game.levels.setLevel(game.levels.levelNumber + 1);
             game.boss = null;
+            game.pauseBetweenLevels();
         }
     }
 }
