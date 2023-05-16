@@ -15,7 +15,11 @@ function getData(server = "main") {
     }
     xhr.send();
     xhr.onerror = () => {
-        getData("backup");
+        if (server == "main") {
+            getData("backup");
+        } else if (server == "backup") {
+            scoreboard.innerHTML = `<h1>Server is down</h1>`;
+        }
     };
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {

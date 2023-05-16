@@ -37,7 +37,18 @@ function getPlayerProfile(nickname, server = "main") {
     }
     xhr.send();
     xhr.onerror = () => {
-        getPlayerProfile(nickname, "backup");
+        if (server == "main") {
+            getPlayerProfile(nickname, "backup");
+        } else if (server == "backup") {
+            playerDataDiv.innerHTML =
+                "<p>Server is down</p>" +
+                "<br>" +
+                "<p>If you want to log out click the button below</p>" +
+                "<br>" +
+                "<button onclick='logOut()'>Log Out</button>";
+            document.getElementById("best5games").style.display = "none";
+            h2.style.display = "none";
+        }
     };
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {

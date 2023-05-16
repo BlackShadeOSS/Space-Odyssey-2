@@ -1,5 +1,7 @@
 const canvas = document.getElementById("board");
 const ctx = canvas.getContext("2d");
+const inventory = document.getElementById("inventory");
+const ctxInv = inventory.getContext("2d");
 const withcanvas = document.querySelector(".withcanvas")[0];
 const progressbar = document.querySelector(".progressBar");
 
@@ -310,20 +312,8 @@ class Rock {
         this.width = this.originalWidth / 8;
         this.height = this.originalHeight / 8;
         this.x = Math.floor(Math.random() * (canvas.width - this.width));
-        this.y = 0;
+        this.y = -(this.height + 10 * n);
         this.yVelocity = n;
-        if (game.rocks.length > 0)
-            while (
-                Math.abs(
-                    game.rocks[game.rocks.length - 1].x +
-                        game.rocks[game.rocks.length - 1].width -
-                        (this.x + this.width)
-                ) < 400
-            ) {
-                this.x = Math.floor(
-                    Math.random() * (canvas.width - this.width)
-                );
-            }
     }
     draw() {
         ctx.drawImage(
@@ -403,7 +393,8 @@ class Game {
             document
                 .querySelector(".warningSign")
                 .addEventListener("click", function () {
-                    document.querySelector(".warningSign").remove();
+                    if (document.querySelector(".warningSign"))
+                        document.querySelector(".warningSign").remove();
                 });
         });
     }
@@ -600,9 +591,6 @@ class Game {
         // spawn boss
         if (
             game.timeOnThisLevel > game.levels.levelTime &&
-            game.boss == null &&
-            game.levels.bossNumber != null &&
-            game.levels.levelNumber != 6 &&
             game.levels.bossKilled == false
         ) {
             if (game.boss == null && game.levels.bossNumber != null) {
@@ -960,6 +948,9 @@ class Levels {
                 if (!game.stop) game.rocks.push(new Rock(this.rockSpeed));
         }, this.rockIntervalTime);
         game.timeOnThisLevel = 0;
+        setTimeout(() => {
+            this.bossKilled = false;
+        }, 1000);
     }
     level2() {
         this.levelTime = 300000;
@@ -975,6 +966,9 @@ class Levels {
                 if (!game.stop) game.rocks.push(new Rock(this.rockSpeed));
         }, this.rockIntervalTime);
         game.timeOnThisLevel = 0;
+        setTimeout(() => {
+            this.bossKilled = false;
+        }, 1000);
     }
     level3() {
         this.levelTime = 300000;
@@ -990,6 +984,9 @@ class Levels {
                 if (!game.stop) game.rocks.push(new Rock(this.rockSpeed));
         }, this.rockIntervalTime);
         game.timeOnThisLevel = 0;
+        setTimeout(() => {
+            this.bossKilled = false;
+        }, 1000);
     }
     level4() {
         this.levelTime = 300000;
@@ -1005,6 +1002,9 @@ class Levels {
                 if (!game.stop) game.rocks.push(new Rock(this.rockSpeed));
         }, this.rockIntervalTime);
         game.timeOnThisLevel = 0;
+        setTimeout(() => {
+            this.bossKilled = false;
+        }, 1000);
     }
     level5() {
         this.levelTime = 450000;
@@ -1020,6 +1020,9 @@ class Levels {
                 if (!game.stop) game.rocks.push(new Rock(this.rockSpeed));
         }, this.rockIntervalTime);
         game.timeOnThisLevel = 0;
+        setTimeout(() => {
+            this.bossKilled = false;
+        }, 1000);
     }
     level6() {
         this.levelTime = 0;
@@ -1035,6 +1038,9 @@ class Levels {
                 if (!game.stop) game.rocks.push(new Rock(this.rockSpeed));
         }, this.rockIntervalTime);
         game.timeOnThisLevel = 0;
+        setTimeout(() => {
+            this.bossKilled = true;
+        }, 1000);
     }
 }
 
@@ -1123,4 +1129,8 @@ class Boss {
             game.pauseBetweenLevels();
         }
     }
+}
+
+class Inventory {
+    constructor() {}
 }
