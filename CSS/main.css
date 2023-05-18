@@ -175,7 +175,7 @@ p {
     transform: rotate(45deg) translate(-5px, -6px);
 }
 
-@media (min-width: 1000px) {
+@media (min-width: 1300px) {
     .menu-toggle {
         display: none;
     }
@@ -313,7 +313,7 @@ p {
     text-decoration: underline dodgerblue;
 }
 
-@media (max-width: 1000px) {
+@media (max-width: 1300px) {
     .mobile-menu.open {
         display: block;
     }
@@ -323,7 +323,7 @@ p {
     }
 }
 
-@media (min-width: 1000px) {
+@media (min-width: 1300px) {
     .mobile-menu.open {
         display: none;
     }

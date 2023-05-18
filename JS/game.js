@@ -787,7 +787,7 @@ class Game {
     }
 
     randomItem() {
-        if (Math.floor(Math.random() * 100) < 10) {
+        if (Math.floor(Math.random() * 100) < 15) {
             // 15% chance for each item to spawn
             // switch (Math.floor(Math.random() * 6)) {
             //     case 0:
