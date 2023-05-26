@@ -15,7 +15,7 @@ body::after {
 }
 
 /* add random rocks across body */
-@media (min-width: 1850px) {
+@media (min-width: 2000px) {
     body::before {
         content: "";
         position: absolute;
